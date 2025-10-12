@@ -66,7 +66,8 @@ class _CadastroPageState extends State<CadastroPage> {
     final formWidth = screenWidth < 600 ? screenWidth * 0.9 : 500.0;
 
     return Scaffold(
-      backgroundColor: const Color(0x3320B4C4),
+
+      backgroundColor: const Color(0xFFBEE2E6),
       body: Stack(
         children: [
           Positioned(

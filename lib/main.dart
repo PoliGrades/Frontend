@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:polieats_frontend/src/widgets/tela_cadastro.dart';
+import 'package:polieats_frontend/src/widgets/cadastro_desktop.dart';
+import 'package:polieats_frontend/src/widgets/cadastro_mobile.dart';
+import 'package:polieats_frontend/responsividade/responsividade.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const CadastroPage(),
+        home: const Responsividade(mobile: TelaCadastro(), desktop: CadastroApp()), // Responsividade das telas
     );
   }
 }
