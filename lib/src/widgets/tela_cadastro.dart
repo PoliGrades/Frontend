@@ -52,7 +52,7 @@ class _CadastroPageState extends State<CadastroPage> {
   }
 
   void _abrirPolitica() async {
-    const url = ''; // Coloque aqui a URL da sua política de privacidade
+    const url = ''; //ainda a colocar
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     }
@@ -112,6 +112,11 @@ class _CadastroPageState extends State<CadastroPage> {
                         controller: _nomeController,
                         cursorColor: azulBotao,
                         decoration: InputDecoration(
+                          hintText: 'Digite seu nome',
+                          hintStyle: GoogleFonts.leagueSpartan(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          ),
                           filled: true,
                           fillColor: Colors.white,
                           border: _getBorder(),
@@ -124,7 +129,7 @@ class _CadastroPageState extends State<CadastroPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Campo E-mail com dica
+                      // Campo E-mail
                       Text(
                         'E-mail',
                         style: GoogleFonts.leagueSpartan(
@@ -173,6 +178,11 @@ class _CadastroPageState extends State<CadastroPage> {
                         cursorColor: azulBotao,
                         obscureText: true,
                         decoration: InputDecoration(
+                          hintText: 'Digite sua senha',
+                          hintStyle: GoogleFonts.leagueSpartan(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          ),
                           filled: true,
                           fillColor: Colors.white,
                           border: _getBorder(),
@@ -200,6 +210,11 @@ class _CadastroPageState extends State<CadastroPage> {
                         cursorColor: azulBotao,
                         obscureText: true,
                         decoration: InputDecoration(
+                          hintText: 'Confirme sua senha',
+                          hintStyle: GoogleFonts.leagueSpartan(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          ),
                           filled: true,
                           fillColor: Colors.white,
                           border: _getBorder(),
