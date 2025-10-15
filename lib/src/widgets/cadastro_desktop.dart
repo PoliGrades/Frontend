@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,16 +35,37 @@ class _CadastroPageState extends State<CadastroPage> {
   final _senhaController = TextEditingController();
   final _confirmarSenhaController = TextEditingController();
 
-  void _cadastrar() {
-    if (_formKey.currentState!.validate()) {
+void _cadastrar() async { 
+  if (_formKey.currentState!.validate()) {
+    final url = Uri.parse('https://api.poligrades.matelz.dev/auth/register');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': _nomeController.text,
+        'email': _emailController.text,
+        'password': _senhaController.text,
+        'role': 'STUDENT',
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cadastro realizado com sucesso!'),
+          content: Text('Cadastro realizado!'),
           backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erro no cadastro'),
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
+}
 
   OutlineInputBorder _getBorder({Color color = Colors.black26}) {
     return OutlineInputBorder(
