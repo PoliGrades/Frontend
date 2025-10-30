@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -40,7 +41,7 @@ void _cadastrar() async {
     final url = Uri.parse('https://api.poligrades.matelz.dev/auth/register');
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json', },
       body: jsonEncode({
         'name': _nomeController.text,
         'email': _emailController.text,

@@ -1,10 +1,7 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 import 'package:polieats_frontend/src/widgets/input_field/input_field.dart';
 import 'package:polieats_frontend/src/widgets/privacy_policy.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CadastroForm extends StatefulWidget {
   const CadastroForm({super.key});
