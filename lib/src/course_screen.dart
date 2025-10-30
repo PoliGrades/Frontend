@@ -30,7 +30,7 @@ class _CourseScreenState extends State<CourseScreen> {
     final grades = gradesController.getGradesForCourse(widget.course.name);
 
     return Scaffold(
-      backgroundColor: Colors.white24,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

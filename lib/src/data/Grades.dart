@@ -50,6 +50,10 @@ class Grades {
     return grades.where((grade) => grade.course == courseName).toList();
   }
 
+  List<Grade> getGradesForAssignment(String assignmentName) {
+    return grades.where((grade) => grade.assignmentName == assignmentName).toList();
+  }
+
   List<Grade> getAllGrades() {
     return grades;
   }
