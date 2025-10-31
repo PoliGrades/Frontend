@@ -31,6 +31,13 @@ class Grades {
       dateRecorded: DateTime.now(),
     ),
     Grade(
+      assignmentName: 'Função de segundo grau',
+      score: 88,
+      maxScore: 100,
+      course: 'Matemática',
+      dateRecorded: DateTime.now(),
+    ),
+    Grade(
       assignmentName: 'Projeto de Ciências',
       score: 90,
       maxScore: 100,

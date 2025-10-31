@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:polieats_frontend/src/home_screen.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-        home: HomeScreen(), // Responsividade das telas
+        home: AdminHomeScreen(), // Responsividade das telas
     );
   }
 }
