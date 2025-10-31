@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
               spacing: 20,
               children: [
                 Container(
+                  color: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
