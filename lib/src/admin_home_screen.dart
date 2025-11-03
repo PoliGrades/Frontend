@@ -891,8 +891,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Atividades',
+            icon: Icon(Icons.group),
+            label: 'Alunos',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],

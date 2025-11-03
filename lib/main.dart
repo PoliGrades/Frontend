@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:polieats_frontend/src/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +11,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    GoogleFonts.config.allowRuntimeFetching = true;
+
     return MaterialApp(
       title: 'Cadastro',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.from(alpha: 255, red: 45, green: 176, blue: 194)),
+        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
       ),
-        home: AdminHomeScreen(), // Responsividade das telas
+        home: LoginScreen(), // Responsividade das telas
     );
   }
 }
