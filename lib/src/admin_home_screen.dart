@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
+import 'package:polieats_frontend/src/create_assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
@@ -174,22 +175,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               fontSize: 18,
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreateAssignmentScreen(),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.add, color: color),
+                            style: IconButton.styleFrom(
                               backgroundColor: accentColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: Text(
-                              "Ver todas",
-                              style: TextStyle(
-                                fontFamily:
-                                    GoogleFonts.leagueSpartan().fontFamily,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: color,
                               ),
                             ),
                           ),
