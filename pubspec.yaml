@@ -63,6 +63,7 @@ flutter:
     - assets/images/shape_1.png
     - assets/images/shape_2.png
     - assets/images/shape_3.png
+    - assets/images/shape_4.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
