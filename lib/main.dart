@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cadastro',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.from(alpha: 255, red: 45, green: 176, blue: 194)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 45, 176, 194)),
         fontFamily: GoogleFonts.leagueSpartan().fontFamily,
       ),
         home: LoginScreen(), // Responsividade das telas
