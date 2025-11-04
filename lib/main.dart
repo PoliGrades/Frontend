@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:polieats_frontend/src/login_screen.dart';
+import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,10 +16,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cadastro',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 45, 176, 194)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.from(alpha: 255, red: 45, green: 176, blue: 194),
+        ),
         fontFamily: GoogleFonts.leagueSpartan().fontFamily,
       ),
-        home: LoginScreen(), // Responsividade das telas
+      home: PrivacyPolicyScreen(), // Responsividade das telas
     );
   }
 }
