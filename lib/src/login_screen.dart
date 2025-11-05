@@ -101,53 +101,52 @@ class DesktopLoginScreen extends StatelessWidget {
                     // Bottom section: button and warning text
                     SizedBox(
                       width: 450,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            spacing: 20,
-                            children: [
-                              InputWithTile(
-                                title: 'Email',
-                                hintText: 'nome@p4ed.com.br',
-                                onChanged: (value) {
-                                  // Handle email change
-                                },
-                              ),
-                              InputWithTile(
-                                title: 'Senha',
-                                hintText: 'Digite sua senha',
-                                onChanged: (value) {
-                                  // Handle password change
-                                },
-                                isPassword: true,
-                                ),
-                              Button(
-                                text: 'Entrar',
-                                onPressed: () {
-                                  // Handle login button press
-                                  Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        HomeScreen(),
-                                  ),
-                                );
-                                },
-                              ),
-                              const SizedBox(height: 20),
-                              Center(
-                                child: Text(
-                                  'Ao entrar, você concorda com nossos\n Termos de Serviço e Política de Privacidade.',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.leagueSpartan(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                            ],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 20,
+                        children: [
+                          InputWithTile(
+                            title: 'Email',
+                            hintText: 'nome@p4ed.com.br',
+                            onChanged: (value) {
+                              // Handle email change
+                            },
                           ),
-                        ),
+                          InputWithTile(
+                            title: 'Senha',
+                            hintText: 'Digite sua senha',
+                            onChanged: (value) {
+                              // Handle password change
+                            },
+                            isPassword: true,
+                          ),
+                          Button(
+                            text: 'Entrar',
+                            onPressed: () {
+                              // Handle login button press
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: Text(
+                              'Ao entrar, você concorda com nossos\n Termos de Serviço e Política de Privacidade.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.leagueSpartan(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -175,16 +174,11 @@ class MobileLoginScreen extends StatelessWidget {
             left: 20,
             child: Image.asset('assets/images/logo.png', width: 70, height: 70),
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Image.asset('assets/images/shape_2.png', scale: 2.2),
-          ),
           SizedBox(
             width: size.width,
             child: Padding(
               padding: EdgeInsetsGeometry.directional(
-                top: 150,
+                top: 120,
                 start: 30,
                 end: 30,
                 bottom: 80,
@@ -246,12 +240,11 @@ class MobileLoginScreen extends StatelessWidget {
                         onPressed: () {
                           // Handle login button press
                           Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        HomeScreen(),
-                                  ),
-                                );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 20),
