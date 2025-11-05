@@ -16,24 +16,22 @@ class MyApp extends StatelessWidget {
     GoogleFonts.config.allowRuntimeFetching = true;
 
     return MaterialApp(
-      title: 'Cadastro',
+      title: 'PoliGrades',
       locale: const Locale('pt', 'BR'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
-        SfGlobalLocalizations.delegate
+        SfGlobalLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('pt', 'BR'),
-      ],
+      supportedLocales: const [Locale('pt', 'BR')],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color.from(alpha: 255, red: 45, green: 176, blue: 194),
         ),
         fontFamily: GoogleFonts.leagueSpartan().fontFamily,
       ),
-      home: LoginScreen(), // Responsividade das telas
+      home: LoginScreen(),
     );
   }
 }

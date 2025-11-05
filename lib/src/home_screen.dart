@@ -113,7 +113,7 @@ class MobileHomeScreen extends StatelessWidget {
                         margin: EdgeInsets.only(left: 20),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(100)),
-                          color: colorScheme.primary,
+                          color: Color.fromARGB(255, 45, 176, 194),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.white,

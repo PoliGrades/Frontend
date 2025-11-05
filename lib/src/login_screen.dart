@@ -266,7 +266,7 @@ class MobileLoginScreen extends StatelessWidget {
                                 text: 'Termos de Serviço',
                                 style: GoogleFonts.leagueSpartan(
                                   fontSize: 12,
-                                  color: Colors.blue,
+                                  color: Color.fromARGB(255, 45, 176, 194),
                                   decoration: TextDecoration.underline,
                                 ),
 
@@ -293,7 +293,7 @@ class MobileLoginScreen extends StatelessWidget {
                                 text: 'Política de Privacidade.',
                                 style: GoogleFonts.leagueSpartan(
                                   fontSize: 12,
-                                  color: Colors.blue,
+                                  color: Color.fromARGB(255, 45, 176, 194),
                                   decoration: TextDecoration.underline,
                                 ),
                                 recognizer: TapGestureRecognizer()
