@@ -29,7 +29,7 @@ class PrivacyPolicy extends StatelessWidget {
         text: TextSpan( //para as partes diferentes do texto
           style: GoogleFonts.leagueSpartan(
             fontSize: 12,
-            color: const Color(0xFFF676161),
+            color: const Color(0xfff676161),
           ),
           children: [
             const TextSpan(
@@ -39,7 +39,7 @@ class PrivacyPolicy extends StatelessWidget {
               text: 'Política de Privacidade',
               style: GoogleFonts.leagueSpartan(
                 fontSize: 12,
-                color: Color(0xFFF1EB4C3),
+                color: Color(0xfff1eb4c3),
                 decoration: TextDecoration.underline,
               ),
               recognizer: TapGestureRecognizer()..onTap = _abrirLink, //detecta toque usuario e aciona o metodo _abrirlink

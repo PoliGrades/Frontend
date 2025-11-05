@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:polieats_frontend/src/assignment_screen.dart';
-import 'package:polieats_frontend/src/course_screen.dart';
-import 'package:polieats_frontend/src/data/Assignments.dart';
-import 'package:polieats_frontend/src/data/Courses.dart';
-import 'package:polieats_frontend/src/data/Notices.dart';
-import 'package:polieats_frontend/src/profile_screen.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});
