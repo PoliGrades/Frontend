@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
+import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
 
@@ -249,12 +251,64 @@ class MobileLoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       Center(
-                        child: Text(
-                          'Ao entrar, você concorda com nossos\n Termos de Serviço e Política de Privacidade.',
+                        child: RichText(
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.leagueSpartan(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                          text: new TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Ao entrar, você concorda com nossos\n',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Termos de Serviço',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    // Handle Terms of Service tap
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PrivacyPolicyScreen(),
+                                      ),
+                                    );
+                                  },
+                              ),
+                              TextSpan(
+                                text: ' e ',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Política de Privacidade.',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    // Handle Terms of Service tap
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PrivacyPolicyScreen(),
+                                      ),
+                                    );
+                                  },
+                              ),
+                            ],
                           ),
                         ),
                       ),
