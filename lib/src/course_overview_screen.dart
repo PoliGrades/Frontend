@@ -45,6 +45,7 @@ class MobileCourseOverviewScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        toolbarHeight: 100,
         title: Text(
           "Minhas Matérias",
           style: TextStyle(
@@ -58,6 +59,7 @@ class MobileCourseOverviewScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: ListView.builder(
+        padding: EdgeInsets.zero, 
         itemCount: courses.length,
         itemBuilder: (context, index) {
           final course = courses[index];
@@ -82,7 +84,7 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 10.0),
+                padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 0.0),
                 child: Text(
                   "Minhas Matérias",
                   style: TextStyle(
@@ -97,7 +99,7 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.only(top: 10.0), 
+                  padding: const EdgeInsets.only(top: 0.0), 
                   itemCount: courses.length,
                   itemBuilder: (context, index) {
                     final course = courses[index];

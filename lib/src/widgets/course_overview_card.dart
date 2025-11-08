@@ -24,8 +24,6 @@ class CourseOverviewCard extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Icon(course.icon, size: 30, color: course.color),
-                const SizedBox(width: 15),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,6 +47,8 @@ class CourseOverviewCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                Icon(course.icon, size: 30, color: course.color),
+                const SizedBox(width: 15),
                 const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),

@@ -196,7 +196,7 @@ class MobileHomeScreen extends StatelessWidget {
                               "Ver todas",
                               style: TextStyle(
                                 fontFamily:
-                                    GoogleFonts.leagueSpartan().fontFamily,
+                                  GoogleFonts.leagueSpartan().fontFamily,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue,
@@ -282,7 +282,7 @@ class MobileHomeScreen extends StatelessWidget {
                   height: 250,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 15,
+                    spacing: 20,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
