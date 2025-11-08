@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
+import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
@@ -18,6 +19,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+  late final List<Widget> _desktopScreens;
+  
+@override
+  void initState() {
+    super.initState();
+    _desktopScreens = [
+      const CourseOverviewScreen(),
+      // const AssignmentScreen(),
+      // const ProfileScreen(), 
+    ];
+  }
+  
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('pt_BR', null);
@@ -39,7 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return const DesktopHomeScreen();
+            return DesktopHomeScreen(
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+              currentScreen: _desktopScreens[_selectedIndex]
+            );
           } else {
             return const MobileHomeScreen();
           }
@@ -100,7 +124,7 @@ class MobileHomeScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "O que deseja estudar hoje ?",
+                            "O que deseja estudar hoje?",
                             style: TextStyle(
                               fontFamily:
                                   GoogleFonts.leagueSpartan().fontFamily,
@@ -156,7 +180,12 @@ class MobileHomeScreen extends StatelessWidget {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push( context, MaterialPageRoute(
+                                builder: (context) => CourseOverviewScreen(),
+                              ),
+                            );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue.shade100,
                               shape: RoundedRectangleBorder(
@@ -714,7 +743,16 @@ class MobileHomeScreen extends StatelessWidget {
 }
 
 class DesktopHomeScreen extends StatelessWidget {
-  const DesktopHomeScreen({super.key});
+  final int selectedIndex;
+  final Function(int) onItemTapped; 
+  final Widget currentScreen;
+  
+  const DesktopHomeScreen({
+    super.key,
+    required this.selectedIndex,
+    required this.onItemTapped,
+    required this.currentScreen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -789,8 +827,14 @@ class DesktopHomeScreen extends StatelessWidget {
                         ),
                       ),
                       ListTile(
-                        leading: Icon(Icons.book),
-                        title: Text('Matérias'),
+                        leading: const Icon(Icons.home),
+                        selected: selectedIndex == 1,
+                        selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        title: const Text('Matérias'),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                        onTap: () => onItemTapped(1), 
                       ),
                       ListTile(
                         leading: Icon(Icons.assignment),

@@ -43,7 +43,7 @@ dependencies:
   intl: ^0.20.2
   fl_chart: ^1.1.1
   syncfusion_flutter_calendar: ^31.2.5
-  syncfusion_localizations: ^18.1.36
+  syncfusion_localizations: 31.2.5
 
 dev_dependencies:
   flutter_test:
