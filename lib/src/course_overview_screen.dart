@@ -12,6 +12,9 @@ class CourseOverviewScreen extends StatefulWidget{
 class _CourseOverviewScreen extends State<CourseOverviewScreen> {
   final coursesController = Courses();
   late final List<Course> courses;
+  final colorScheme = ColorScheme.fromSeed(
+  seedColor: Color.fromARGB(255, 45, 176, 194),
+);
 
   @override
   void initState() {
@@ -22,7 +25,7 @@ class _CourseOverviewScreen extends State<CourseOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.primary,
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
@@ -43,7 +46,6 @@ class MobileCourseOverviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 100,
         title: Text(
@@ -54,7 +56,6 @@ class MobileCourseOverviewScreen extends StatelessWidget {
             fontSize: 22
           ),
         ),              
-        backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -69,14 +70,46 @@ class MobileCourseOverviewScreen extends StatelessWidget {
     );
   }
 }
+
 class DesktopCourseOverviewScreen extends StatelessWidget {
   final List<Course> courses;
-  const DesktopCourseOverviewScreen({super.key, required this.courses});
+  DesktopCourseOverviewScreen({super.key, required this.courses});
+  final colorScheme = ColorScheme.fromSeed(
+      seedColor: Color.fromARGB(255, 45, 176, 194),
+    );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset('assets/images/logo.png', width: 40, height: 40),
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(100)),
+                color: colorScheme.primary,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white,
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 0),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.transparent,
+                child: Icon(Icons.person, size: 20, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Center(
         child: SizedBox(
           width: 800, 

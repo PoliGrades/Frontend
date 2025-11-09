@@ -179,7 +179,7 @@ class MobileHomeScreen extends StatelessWidget {
                               fontSize: 18,
                             ),
                           ),
-                          ElevatedButton(
+                          ElevatedButton(//////////////////
                             onPressed: () {
                               Navigator.push( context, MaterialPageRoute(
                                 builder: (context) => CourseOverviewScreen(),
@@ -834,7 +834,14 @@ class DesktopHomeScreen extends StatelessWidget {
                         title: const Text('Matérias'),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6)),
-                        onTap: () => onItemTapped(1), 
+                        onTap: () {
+                          Navigator.push(         
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => CourseOverviewScreen(),
+                            ),
+                          );
+                        },
                       ),
                       ListTile(
                         leading: Icon(Icons.assignment),
