@@ -84,7 +84,7 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 0.0),
+                padding: const EdgeInsets.fromLTRB(10.0, 30.0, 20.0, 0.0),
                 child: Text(
                   "Minhas Matérias",
                   style: TextStyle(
