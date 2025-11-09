@@ -43,6 +43,10 @@ class Notices {
       course: 'Física',
     ),
   ];
+  
+  Notices();
+  
+  List<Notice> get allNotices => notices;
 
   List<Notice> getNoticesForCourse(String courseName) {
     return notices.where((notice) => notice.course == courseName).toList();
