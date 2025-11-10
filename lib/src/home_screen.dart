@@ -1008,22 +1008,12 @@ class DesktopHomeScreen extends StatelessWidget {
                                       assignments,
                                     ),
                                     viewHeaderHeight: 50,
-                                    todayHighlightColor: Color.fromARGB(
-                                      255,
-                                      45,
-                                      176,
-                                      194,
-                                    ),
+                                    todayHighlightColor: Color.fromARGB(255, 45, 176, 194),
                                     showDatePickerButton: true,
                                     selectionDecoration: BoxDecoration(
                                       color: Colors.transparent,
                                       border: Border.all(
-                                        color: Color.fromARGB(
-                                          255,
-                                          45,
-                                          176,
-                                          194,
-                                        ),
+                                        color: Color.fromARGB(255, 45, 176, 194),
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.all(

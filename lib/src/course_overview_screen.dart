@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
+import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/widgets/course_overview_card.dart';
 
 class CourseOverviewScreen extends StatefulWidget{
@@ -13,14 +14,32 @@ class _CourseOverviewScreen extends State<CourseOverviewScreen> {
   final coursesController = Courses();
   late final List<Course> courses;
   final colorScheme = ColorScheme.fromSeed(
-  seedColor: Color.fromARGB(255, 45, 176, 194),
-);
+    seedColor: Color.fromARGB(255, 45, 176, 194),
+  );
+
+  int _selectedIndex = 1;
 
   @override
   void initState() {
     super.initState();
     courses = coursesController.allCourses;
   }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 0) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+  } 
+  else if (index == 1) {
+    return;
+  }
+  //add outras telas
+}
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +48,12 @@ class _CourseOverviewScreen extends State<CourseOverviewScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return DesktopCourseOverviewScreen(courses: courses);
+            return DesktopCourseOverviewScreen(
+              courses: courses, 
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped, 
+              homeScreen: HomeScreen(),
+            );
           } else {
             return MobileCourseOverviewScreen(courses: courses);
           }
@@ -57,7 +81,6 @@ class MobileCourseOverviewScreen extends StatelessWidget {
           ),
         ),              
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: ListView.builder(
         padding: EdgeInsets.zero, 
@@ -72,14 +95,29 @@ class MobileCourseOverviewScreen extends StatelessWidget {
 }
 
 class DesktopCourseOverviewScreen extends StatelessWidget {
+  final int selectedIndex;
   final List<Course> courses;
-  DesktopCourseOverviewScreen({super.key, required this.courses});
+  final ValueChanged<int> onItemTapped;
+  final Widget homeScreen;
+
+  DesktopCourseOverviewScreen({
+    super.key, 
+    required this.courses, 
+    required this.selectedIndex, 
+    required this.onItemTapped,
+    required this.homeScreen,
+  });
   final colorScheme = ColorScheme.fromSeed(
       seedColor: Color.fromARGB(255, 45, 176, 194),
-    );
-
+  );
+  final Color selectedTileHighlight = Color.fromARGB(255, 45, 176, 194);
+  final Color primaryColor = Color.fromARGB(255, 45, 176, 194);
+  final Color defaultInactiveColor = Colors.black54;
+  
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+        
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -110,40 +148,120 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Center(
-        child: SizedBox(
-          width: 800, 
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10.0, 30.0, 20.0, 0.0),
-                child: Text(
-                  "Minhas Matérias",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontFamily:GoogleFonts.leagueSpartan().fontFamily,
-                    color: Colors.black87,
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // Lateral menu
+              SizedBox(
+                width: size.width * 0.20,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                  child: Column(
+                    spacing: 20,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        leading: Icon(
+                          Icons.home,
+                          color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
+                        ),
+                        title: Text(
+                          'Início', 
+                          style: TextStyle(
+                            color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
+                          )
+                        ),
+                        selected: selectedIndex == 0,
+                        selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        // Make it rounded
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        onTap: () => onItemTapped(0),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.book,
+                          color: selectedIndex == 1 ? Colors.white : defaultInactiveColor,
+                        ),
+                        title: Text(
+                          'Matérias', 
+                          style: TextStyle(
+                            color: selectedIndex == 1 ? Colors.white : defaultInactiveColor,
+                          )
+                        ),
+                        selected: selectedIndex == 1,
+                        selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                        onTap: () => onItemTapped(1),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.assignment),
+                        title: Text('Atividades'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.person),
+                        title: Text('Perfil'),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
               ),
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(top: 0.0), 
-                  itemCount: courses.length,
-                  itemBuilder: (context, index) {
-                    final course = courses[index];
-                    return CourseOverviewCard(course: course);
-                  },
+              // Vertical divider that accounts for the AppBar height
+              SizedBox(
+                width: 20,
+                child: Center(
+                  child: Container(
+                    width: 1,
+                    height: double.infinity,
+                    color: Colors.grey.shade300,
+                  ),
                 ),
               ),
-            ],
+            Expanded(
+            child: Center(
+              child: SizedBox(
+                width: 800, 
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+                      child: Text(
+                        "Minhas Matérias",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily:GoogleFonts.leagueSpartan().fontFamily,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(top: 0.0), 
+                        itemCount: courses.length,
+                        itemBuilder: (context, index) {
+                          final course = courses[index];
+                          return CourseOverviewCard(course: course);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+        ],       
       ),
     );
   }
 }
+
