@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:polieats_frontend/src/assignment_overview_screen.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
@@ -27,8 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _desktopScreens = [
       const CourseOverviewScreen(),
-      // const AssignmentScreen(),
-      // const ProfileScreen(), 
+      const AssignmentOverviewScreen(),
+      const ProfileScreen(), 
     ];
   }
   
@@ -296,7 +297,12 @@ class MobileHomeScreen extends StatelessWidget {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push( context, MaterialPageRoute(
+                                builder: (context) => AssignmentOverviewScreen(),
+                              ),
+                            );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue.shade100,
                               shape: RoundedRectangleBorder(
@@ -339,6 +345,7 @@ class MobileHomeScreen extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (context) => AssignmentScreen(
                                         assignment: assignment,
+                                        
                                       ),
                                     ),
                                   );
@@ -723,9 +730,9 @@ class MobileHomeScreen extends StatelessWidget {
                 ).push(MaterialPageRoute(builder: (context) => CourseOverviewScreen()));
               break;
             case 2:
-              // Navigator.of(
-              //   context,
-              // ).push(MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()));
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()));
               break;
             case 3:
               Navigator.of(
