@@ -100,6 +100,9 @@ class MobileAssignmenteOverviewScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final futureAssignments = assigments.where((a) => a.dueDate.isAfter(now)).toList();
+    final pastAssignments = assigments.where((a) => a.dueDate.isBefore(now)).toList();
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
@@ -113,14 +116,36 @@ class MobileAssignmenteOverviewScreen extends StatelessWidget{
         ),              
         elevation: 0,
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.zero, 
-        itemCount: assigments.length,
-        itemBuilder: (context, index) {
-          final assignment = assigments[index];
-          return AssignmentOverviewCard(assignment: assignment);
-        },
-      ),
+      body: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        if (futureAssignments.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text("Atividades futuras",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                )),
+          ),
+          ...futureAssignments.map((a) => AssignmentOverviewCard(assignment: a)),
+        ],
+        if (pastAssignments.isNotEmpty) ...[
+          Padding(
+            //padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 16.0),
+            child: Text("Atividades passadas",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                )),
+          ),
+          ...pastAssignments.map((a) => AssignmentOverviewCard(assignment: a)),
+        ],
+      ],
+    ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         backgroundColor: Colors.white,
@@ -174,6 +199,10 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final now = DateTime.now();
+    final futureAssignments = assignments.where((a) => a.dueDate.isAfter(now)).toList();
+    final pastAssignments = assignments.where((a) => a.dueDate.isBefore(now)).toList();
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -307,7 +336,6 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
               ),
             ),
           ),
-            
           Expanded(
             child: Center(
               child: SizedBox(
@@ -316,7 +344,7 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 0.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Text(
                       "Minhas Atividades",
                       style: TextStyle(
@@ -330,15 +358,41 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(top: 0.0), 
-                      itemCount: assignments.length,
-                      itemBuilder: (context, index) {
-                        final assignment = assignments[index];
-                        return AssignmentOverviewCard(assignment: assignment);
-                      },
+                    child: ListView(
+                      padding: const EdgeInsets.only(top: 0.0),
+                      children: [
+                        if (futureAssignments.isNotEmpty) ...[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 16.0),
+                            child: Text(
+                              "Atividades futuras",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              ),
+                            ),
+                          ),
+                          ...futureAssignments.map((a) => AssignmentOverviewCard(assignment: a)),
+                        ],
+                        if (pastAssignments.isNotEmpty) ...[
+                          Padding(
+                            padding: const 
+                            EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 16.0),
+                            child: Text(
+                              "Atividades passadas",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              ),
+                            ),
+                          ),
+                          ...pastAssignments.map((a) => AssignmentOverviewCard(assignment: a)),
+                        ],
+                      ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

@@ -46,7 +46,7 @@ class Assignments {
   Assignment(
     title: 'Leitura de Material de Matemática',
     description: 'Ler o material sobre álgebra linear.',
-    dueDate: DateTime.now().add(const Duration(days: 2)),
+    dueDate: DateTime.now().subtract(const Duration(days: 2)),
     course: 'Matemática',
     attachments: [
       Attachment(
