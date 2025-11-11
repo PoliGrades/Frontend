@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/widgets/course_overview_card.dart';
+import 'package:polieats_frontend/src/profile_screen.dart';
+
 
 class CourseOverviewScreen extends StatefulWidget{
   const CourseOverviewScreen({super.key});
@@ -55,7 +58,11 @@ class _CourseOverviewScreen extends State<CourseOverviewScreen> {
               homeScreen: HomeScreen(),
             );
           } else {
-            return MobileCourseOverviewScreen(courses: courses);
+            return MobileCourseOverviewScreen(
+              courses: courses,
+              selectedIndex: _selectedIndex,
+              onItemTapped: _onItemTapped,
+            );
           }
         },
       ),
@@ -65,7 +72,15 @@ class _CourseOverviewScreen extends State<CourseOverviewScreen> {
 
 class MobileCourseOverviewScreen extends StatelessWidget {
   final List<Course> courses;
-  const MobileCourseOverviewScreen({super.key, required this.courses});
+  final int selectedIndex;
+  final ValueChanged<int> onItemTapped;
+
+  const MobileCourseOverviewScreen({
+    super.key, 
+    required this.courses, 
+    required this.selectedIndex,
+    required this.onItemTapped
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +104,32 @@ class MobileCourseOverviewScreen extends StatelessWidget {
           final course = courses[index];
           return CourseOverviewCard(course: course);
         },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: selectedIndex,
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        iconSize: 24,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        selectedLabelStyle: TextStyle(
+          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+          fontSize: 12,
+        ),
+        onTap: onItemTapped,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Atividades',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
       ),
     );
   }

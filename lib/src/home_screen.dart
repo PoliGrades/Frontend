@@ -179,7 +179,7 @@ class MobileHomeScreen extends StatelessWidget {
                               fontSize: 18,
                             ),
                           ),
-                          ElevatedButton(//////////////////
+                          ElevatedButton(
                             onPressed: () {
                               Navigator.push( context, MaterialPageRoute(
                                 builder: (context) => CourseOverviewScreen(),
@@ -718,8 +718,14 @@ class MobileHomeScreen extends StatelessWidget {
             case 0:
               break;
             case 1:
+              Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => CourseOverviewScreen()));
               break;
             case 2:
+              // Navigator.of(
+              //   context,
+              // ).push(MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()));
               break;
             case 3:
               Navigator.of(
