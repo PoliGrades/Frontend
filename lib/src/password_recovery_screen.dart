@@ -64,31 +64,6 @@ class PasswordRecoveryScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Lembrou a senha? ',
-                              style: GoogleFonts.leagueSpartan(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Voltar para o login',
-                              style: GoogleFonts.leagueSpartan(
-                                fontSize: 16,
-                                color: const Color.fromARGB(255, 45, 176, 194),
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  Navigator.pop(context);
-                                },
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
