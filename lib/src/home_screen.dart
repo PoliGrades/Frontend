@@ -776,6 +776,9 @@ class DesktopHomeScreen extends StatelessWidget {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: Color.fromARGB(255, 45, 176, 194),
     );
+    final Color selectedTileHighlight = Color.fromARGB(255, 45, 176, 194);
+    final Color primaryColor = Color.fromARGB(255, 45, 176, 194);
+    final Color defaultInactiveColor = Colors.black54;
 
     final coursesController = Courses();
     final courses = coursesController.allCourses;
@@ -829,16 +832,25 @@ class DesktopHomeScreen extends StatelessWidget {
                     spacing: 20,
                     children: [
                       ListTile(
-                        leading: Icon(Icons.home),
-                        selected: true,
-                        selectedTileColor: Color.fromARGB(255, 45, 176, 194),
-                        selectedColor: Colors.white,
-                        title: Text('Início'),
-                        // Make it rounded
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
-                        ),
+                      leading: Icon(
+                       Icons.home,
+                       color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
                       ),
+                      title: Text(
+                        'Início', 
+                        style: TextStyle(
+                          color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
+                        )
+                      ),
+                      selected: selectedIndex == 0,
+                      selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+                      selectedColor: Colors.white,
+                      // Make it rounded
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(6)),
+                      ),
+                      onTap: () => onItemTapped(0),
+                    ),
                       ListTile(
                         leading: const Icon(Icons.home),
                         selected: selectedIndex == 1,
@@ -857,12 +869,38 @@ class DesktopHomeScreen extends StatelessWidget {
                         },
                       ),
                       ListTile(
-                        leading: Icon(Icons.assignment),
-                        title: Text('Atividades'),
+                        leading: const Icon(Icons.assignment),
+                        selected: selectedIndex == 2,
+                        selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        title: const Text('Atividades'),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                        onTap: () {
+                          Navigator.push(         
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => AssignmentOverviewScreen(),
+                            ),
+                          );
+                        },
                       ),
                       ListTile(
                         leading: Icon(Icons.person),
+                        //selected: selectedIndex == 3,
+                        selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
                         title: Text('Perfil'),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                        onTap: () {
+                          Navigator.push(         
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

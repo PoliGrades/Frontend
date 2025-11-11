@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:polieats_frontend/src/assignment_overview_screen.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
@@ -241,30 +242,72 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
                         onTap: () => onItemTapped(1),
                       ),
                       ListTile(
-                        leading: Icon(Icons.assignment),
-                        title: Text('Atividades'),
+                      leading: Icon(
+                        Icons.assignment,
+                        color: selectedIndex == 2 ? Colors.white : defaultInactiveColor,
+                        ),
+                      title: Text(
+                        'Atividades',
+                        style: TextStyle(
+                          color: selectedIndex == 2 ? Colors.white : defaultInactiveColor,
+                        )
                       ),
-                      ListTile(
-                        leading: Icon(Icons.person),
-                        title: Text('Perfil'),
+                      selected: selectedIndex == 2,
+                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                      onTap: () {
+                          Navigator.push(         
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => AssignmentOverviewScreen(),
+                            ),
+                          );
+                        },
+                    ),
+                    ListTile(
+                      leading: Icon(
+                        Icons.person,
+                        color: selectedIndex == 3 ? Colors.white : defaultInactiveColor,
+                        ),
+                      title: Text(
+                        'Perfil',
+                        style: TextStyle(
+                          color: selectedIndex == 3 ? Colors.white : defaultInactiveColor,
+                        )
                       ),
-                    ],
-                  ),
+                      selected: selectedIndex == 3,
+                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                      onTap: () {
+                        Navigator.push(         
+                          context, 
+                          MaterialPageRoute(
+                            builder: (context) => ProfileScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
+            ),
+          ),
+         // Vertical divider that accounts for the AppBar height
+          SizedBox(
+            width: 20,
+            child: Center(
+              child: Container(
+                width: 1,
+                height: double.infinity,
+                color: Colors.grey.shade300,
               ),
-              // Vertical divider that accounts for the AppBar height
-              SizedBox(
-                width: 20,
-                child: Center(
-                  child: Container(
-                    width: 1,
-                    height: double.infinity,
-                    color: Colors.grey.shade300,
-                  ),
-                ),
-              ),
-            Expanded(
+            ),
+          ),
+          Expanded(
             child: Center(
               child: SizedBox(
                 width: 800, 
