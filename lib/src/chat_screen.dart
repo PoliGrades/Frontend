@@ -220,10 +220,22 @@ class MobileChatScreen extends StatelessWidget {
         children: [
           Positioned(
             top: 20,
-            left: 20,
+            left: 8,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    size: 28,
+                    color: Colors.grey[800],
+                  ),
+                  tooltip: 'Voltar',
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+                const SizedBox(width: 4),
                 const Icon(Icons.account_circle, size: 50, color: Colors.grey),
                 const SizedBox(width: 8),
                 Text(
@@ -244,89 +256,136 @@ class MobileChatScreen extends StatelessWidget {
             right: 0,
             child: Container(height: 1, color: Colors.grey[300]),
           ),
-          Positioned(
-            top: 0,
-            right: 10,
-            child: Image.asset('assets/images/logo.png', width: 90, height: 90),
-          ),
           SizedBox(
             width: size.width,
             child: Padding(
               padding: EdgeInsetsDirectional.only(
-                top: 35,
-                start: 30,
-                end: 30,
+                top: 90,
+                start: 16,
+                end: 16,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 16,
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Spacer(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Stack(
-                              alignment: Alignment.centerRight,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.zero,
-                                  child: InputWithTile(
-                                    title: '',
-                                    hintText: 'Digite sua mensagem...',
-                                    onChanged: (value) {},
-                                    // reduce bottom spacing for mobile
-                                    bottomMargin: 4,
-                                    suffixIcon: IconButton(
-                                      tooltip: 'Enviar',
-                                      icon: const Icon(
-                                        Icons.send,
-                                        size: 24,
-                                        color: Color.fromARGB(
-                                          255,
-                                          45,
-                                          176,
-                                          194,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        // ação ao pressionar o ícone
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      children: const [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ChatBubble(
+                            text:
+                                'Olá, bem-vindo ao chat! Em que posso ajudar?',
+                            isOwn: false,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Center(
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text:
-                                    'Todas as mensagens enviadas são utilizadas de acordo com a nossa política de privacidade.',
-                                style: GoogleFonts.leagueSpartan(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                        ),
+                        SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ChatBubble(
+                            text:
+                                'Olá Professor, preciso de ajuda com a avaliação.',
+                            isOwn: true,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ChatBubble(
+                            text: 'Claro — diga qual dúvida você tem.',
+                            isOwn: false,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InputWithTile(
+                          title: '',
+                          hintText: 'Digite sua mensagem...',
+                          onChanged: (value) {},
+                          bottomMargin: 4,
+                          suffixIcon: IconButton(
+                            tooltip: 'Enviar',
+                            icon: const Icon(
+                              Icons.send,
+                              size: 24,
+                              color: Color.fromARGB(255, 45, 176, 194),
+                            ),
+                            onPressed: () {
+                              // ação ao pressionar o ícone
+                            },
                           ),
                         ),
                       ),
                     ],
+                  ),
+
+                  const SizedBox(height: 4),
+                  Center(
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                'Todas as mensagens enviadas são utilizadas de acordo com a nossa política de privacidade.',
+                            style: GoogleFonts.leagueSpartan(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ChatBubble extends StatelessWidget {
+  final String text;
+  final bool isOwn;
+
+  const ChatBubble({super.key, required this.text, this.isOwn = true});
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = isOwn ? const Color(0xFF42C9DC) : Colors.grey[200];
+    final textColor = isOwn ? Colors.white : Colors.black87;
+
+    const corner = Radius.circular(16);
+    final bottomLeftRadius = isOwn ? corner : Radius.zero;
+    final bottomRightRadius = isOwn ? Radius.zero : corner;
+
+    final borderRadius = BorderRadius.only(
+      topLeft: corner,
+      topRight: corner,
+      bottomLeft: bottomLeftRadius,
+      bottomRight: bottomRightRadius,
+    );
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 260),
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(color: bgColor, borderRadius: borderRadius),
+          child: Text(
+            text,
+            style: GoogleFonts.leagueSpartan(fontSize: 14, color: textColor),
+          ),
+        ),
       ),
     );
   }
