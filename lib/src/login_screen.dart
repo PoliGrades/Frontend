@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
@@ -16,6 +18,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -23,9 +28,15 @@ class _LoginScreenState extends State<LoginScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return const DesktopLoginScreen();
+            return DesktopLoginScreen(
+              emailController: emailController,
+              passwordController: passwordController,
+            );
           } else {
-            return const MobileLoginScreen();
+            return MobileLoginScreen(
+              emailController: emailController,
+              passwordController: passwordController,
+            );
           }
         },
       ),
@@ -34,7 +45,14 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class DesktopLoginScreen extends StatelessWidget {
-  const DesktopLoginScreen({super.key});
+  const DesktopLoginScreen({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+  });
+
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +131,7 @@ class DesktopLoginScreen extends StatelessWidget {
                             hintText: 'nome@p4ed.com.br',
                             onChanged: (value) {
                               // Handle email change
+                              emailController.text = value;
                             },
                           ),
                           InputWithTile(
@@ -120,6 +139,7 @@ class DesktopLoginScreen extends StatelessWidget {
                             hintText: 'Digite sua senha',
                             onChanged: (value) {
                               // Handle password change
+                              passwordController.text = value;
                             },
                             isPassword: true,
                           ),
@@ -127,12 +147,47 @@ class DesktopLoginScreen extends StatelessWidget {
                             text: 'Entrar',
                             onPressed: () {
                               // Handle login button press
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => HomeScreen(),
+                              //   ),
+                              // );
+
+                              api
+                              .loginUser(
+                                emailController.text,
+                                passwordController.text,
+                              )
+                              .then((user) {
+                                if (user.role == 'PROFESSOR') {
+                                  // Navigate to professor home screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AdminHomeScreen(),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        HomeScreen(user: user),
+                                  ),
+                                );
+                              })
+                              .catchError((error) {
+                                // Show error message
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Email ou senha inválidos.'),
+                                  ),
+                                );
+                              });
                             },
                           ),
                           const SizedBox(height: 20),
@@ -214,7 +269,14 @@ class DesktopLoginScreen extends StatelessWidget {
 }
 
 class MobileLoginScreen extends StatelessWidget {
-  const MobileLoginScreen({super.key});
+  const MobileLoginScreen({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+  });
+
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   @override
   Widget build(BuildContext context) {
@@ -270,6 +332,7 @@ class MobileLoginScreen extends StatelessWidget {
                         hintText: 'nome@p4ed.com.br',
                         onChanged: (value) {
                           // Handle email change
+                          emailController.text = value;
                         },
                       ),
                       InputWithTile(
@@ -277,6 +340,7 @@ class MobileLoginScreen extends StatelessWidget {
                         hintText: 'Digite sua senha',
                         onChanged: (value) {
                           // Handle password change
+                          passwordController.text = value;
                         },
                         isPassword: true,
                       ),
@@ -294,12 +358,47 @@ class MobileLoginScreen extends StatelessWidget {
                         text: 'Entrar',
                         onPressed: () {
                           // Handle login button press
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeScreen(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => HomeScreen(),
+                          //   ),
+                          // );
+
+                          api
+                              .loginUser(
+                                emailController.text,
+                                passwordController.text,
+                              )
+                              .then((user) {
+                                if (user.role == 'PROFESSOR') {
+                                  // Navigate to professor home screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AdminHomeScreen(),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        HomeScreen(user: user),
+                                  ),
+                                );
+                              })
+                              .catchError((error) {
+                                // Show error message
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Email ou senha inválidos.'),
+                                  ),
+                                );
+                              });
                         },
                       ),
                       const SizedBox(height: 20),

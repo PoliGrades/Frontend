@@ -7,11 +7,14 @@ import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.user});
+
+  final User user;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,9 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return const DesktopHomeScreen();
+            return DesktopHomeScreen(currentUser: widget.user);
           } else {
-            return const MobileHomeScreen();
+            return MobileHomeScreen(currentUser: widget.user);
           }
         },
       ),
@@ -50,7 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class MobileHomeScreen extends StatelessWidget {
-  const MobileHomeScreen({super.key});
+  const MobileHomeScreen({super.key, required this.currentUser});
+
+  final User currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +96,7 @@ class MobileHomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Boas-vindas João!",
+                            "Boas-vindas ${currentUser.name.split(" ")[0]}!",
                             style: TextStyle(
                               fontFamily:
                                   GoogleFonts.leagueSpartan().fontFamily,
@@ -714,7 +719,9 @@ class MobileHomeScreen extends StatelessWidget {
 }
 
 class DesktopHomeScreen extends StatelessWidget {
-  const DesktopHomeScreen({super.key});
+  const DesktopHomeScreen({super.key, required this.currentUser});
+
+  final User currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -746,7 +753,7 @@ class DesktopHomeScreen extends StatelessWidget {
               margin: EdgeInsets.only(left: 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(100)),
-                color: colorScheme.primary,
+                color: Color.fromARGB(255, 45, 176, 194),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.white,
@@ -824,7 +831,7 @@ class DesktopHomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bem-vindo de volta, João!',
+                        'Bem-vindo de volta, ${currentUser.name.split(" ")[0]}!',
                         style: TextStyle(
                           fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                           fontSize: 24,
