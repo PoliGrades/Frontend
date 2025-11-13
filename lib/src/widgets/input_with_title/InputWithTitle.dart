@@ -6,6 +6,8 @@ class InputWithTile extends StatefulWidget {
     required this.title,
     required this.hintText,
     required this.onChanged,
+    this.onSubmitted,
+    this.controller,
     this.isPassword = false,
     this.suffixIcon,
     this.prefixIcon,
@@ -14,6 +16,8 @@ class InputWithTile extends StatefulWidget {
 
   final String title;
   final String hintText;
+  final TextEditingController? controller;
+  final Function(String)? onSubmitted;
   // onChanged function
   final Function(String) onChanged;
   // obscureText boolean
@@ -43,6 +47,8 @@ class _InputWithTileState extends State<InputWithTile> {
           ),
           const SizedBox(height: 8),
           TextField(
+            controller: widget.controller,
+            onSubmitted: widget.onSubmitted,
             onChanged: widget.onChanged,
             style: const TextStyle(fontSize: 16),
             obscureText: widget.isPassword && !_isVisible,

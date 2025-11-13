@@ -2,37 +2,127 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/src/data/Message.dart';
-import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/socket_service.dart';
-import 'package:polieats_frontend/src/widgets/button.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
-
-SocketService socketService = SocketService();
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key, required this.professorID});
 
   final int professorID;
-  static List<Message> messages = [];
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  late SocketService socketService;
+  List<Message> messages = [];
+  final TextEditingController _messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSocket();
+  }
+
+  void _initializeSocket() {
+    socketService = SocketService();
+    socketService.connect();
+
+    // Listen for previous messages
+    socketService.addListener("previousMessages", (data) {
+      print("Previous Messages: $data");
+
+      if (data is List) {
+        List<Message> prevMessages = [];
+        for (var msgJson in data) {
+          try {
+            final msg = Message.fromJson(Map<String, dynamic>.from(msgJson));
+            prevMessages.add(msg);
+          } catch (e) {
+            print('Error parsing message: $e');
+          }
+        }
+
+        setState(() {
+          messages = prevMessages;
+        });
+      }
+    });
+
+    // Listen for new messages
+    socketService.addListener("newMessage", (data) {
+      print("New Message: $data");
+      
+      try {
+        final newMsg = Message.fromJson(Map<String, dynamic>.from(data));
+        setState(() {
+          messages.add(newMsg);
+        });
+      } catch (e) {
+        print('Error parsing new message: $e');
+      }
+    });
+
+    // Join chat room
+    socketService.emit("joinChat", [widget.professorID]);
+  }
+
+  void _sendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    final newMessage = Message(
+      roomId: 'room_${widget.professorID}',
+      senderId: 506064, // Example user ID
+      senderName: 'Aluno Exemplo',
+      senderRole: 'student',
+      message: text,
+      timestamp: DateTime.now(),
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+
+    setState(() {
+      messages.add(newMessage);
+    });
+
+    // Send message via socket
+    socketService.emit("sendMessage", [{
+      'professorID': widget.professorID,
+      'message': text,
+    }]);
+    
+    _messageController.clear();
+  }
+
+  // @override
+  // void dispose() {
+  //   socketService.disconnect();
+  //   socketService.removeListener("previousMessages");
+  //   socketService.removeListener("newMessage");
+  //   _messageController.dispose();
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return DesktopChatScreen();
+            return DesktopChatScreen(
+              messages: messages,
+              messageController: _messageController,
+              onSendMessage: _sendMessage,
+            );
           } else {
-            return MobileChatScreen(professorID: widget.professorID);
+            return MobileChatScreen(
+              messages: messages,
+              messageController: _messageController,
+              onSendMessage: _sendMessage,
+            );
           }
         },
       ),
@@ -41,7 +131,16 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class DesktopChatScreen extends StatelessWidget {
-  const DesktopChatScreen({super.key});
+  final List<Message> messages;
+  final TextEditingController messageController;
+  final VoidCallback onSendMessage;
+
+  const DesktopChatScreen({
+    super.key,
+    required this.messages,
+    required this.messageController,
+    required this.onSendMessage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,32 +220,19 @@ class DesktopChatScreen extends StatelessWidget {
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: const [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: ChatBubble(
-                                text:
-                                    'Olá, bem-vindo ao chat! Em que posso ajudar?',
-                                isOwn: false,
-                              ),
-                            ),
-                            SizedBox(height: 24),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ChatBubble(
-                                text:
-                                    'está responsivo Alexandre',
-                                isOwn: true,
-                              ),
-                            ),
-                            SizedBox(height: 24),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: ChatBubble(
-                                text: 'Claro — diga qual dúvida você tem.',
-                                isOwn: false,
-                              ),
-                            ),
+                          children: [
+                            ...messages.map((message) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 24),
+                                  child: Align(
+                                    alignment: message.senderId == 506064
+                                        ? Alignment.centerRight
+                                        : Alignment.centerLeft,
+                                    child: ChatBubble(
+                                      text: message.message,
+                                      isOwn: message.senderId == 506064,
+                                    ),
+                                  ),
+                                )),
                           ],
                         ),
                       ),
@@ -160,6 +246,7 @@ class DesktopChatScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TextField(
+                          controller: messageController,
                           style: GoogleFonts.leagueSpartan(fontSize: 18),
                           decoration: InputDecoration(
                             hintText: 'Digite sua mensagem...',
@@ -178,6 +265,7 @@ class DesktopChatScreen extends StatelessWidget {
                               borderSide: BorderSide.none,
                             ),
                           ),
+                          onSubmitted: (_) => onSendMessage(),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -188,7 +276,7 @@ class DesktopChatScreen extends StatelessWidget {
                           size: 34,
                           color: Color.fromARGB(255, 45, 176, 194),
                         ),
-                        onPressed: () {},
+                        onPressed: onSendMessage,
                       ),
                     ],
                   ),
@@ -217,7 +305,13 @@ class DesktopChatScreen extends StatelessWidget {
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              // ação ao clicar
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PrivacyPolicyScreen(),
+                                ),
+                              );
                             },
                         ),
                       ],
@@ -234,38 +328,20 @@ class DesktopChatScreen extends StatelessWidget {
   }
 }
 
-class MobileChatScreen extends StatefulWidget {
-  const MobileChatScreen({super.key, required this.professorID});
+class MobileChatScreen extends StatelessWidget {
+  final List<Message> messages;
+  final TextEditingController messageController;
+  final VoidCallback onSendMessage;
 
-  final int professorID;
-  static const List<Message> messages = [];
+  const MobileChatScreen({
+    super.key,
+    required this.messages,
+    required this.messageController,
+    required this.onSendMessage,
+  });
 
-  @override
-  _MobileChatScreenState createState() => _MobileChatScreenState();
-}
-
-class _MobileChatScreenState extends State<MobileChatScreen> {
   @override
   Widget build(BuildContext context) {
-    socketService.addListener("previousMessages", (data) {
-      print("Previous Messages: $data");
-
-      // Parse and add previous messages to the list
-      List<Message> prevMessages = [];
-      if (data is List) {
-        for (var msgJson in data) {
-          final msg = Message.fromJson(Map<String, dynamic>.from(msgJson));
-          prevMessages.add(msg);
-        }
-      }
-
-      setState(() {
-        ChatScreen.messages = prevMessages;
-      });
-    });
-
-    socketService.emit("joinChat", [widget.professorID]);
-
     final size = MediaQuery.of(context).size;
 
     return SafeArea(
@@ -322,24 +398,24 @@ class _MobileChatScreenState extends State<MobileChatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                    Expanded(
+                  Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      itemCount: MobileChatScreen.messages.length,
+                      itemCount: messages.length,
                       itemBuilder: (context, index) {
-                      final m = MobileChatScreen.messages[index];
-                      final dynamic dm = m as dynamic;
-                      final String text =
-                        dm.text ?? dm.message ?? dm.content ?? m.toString();
-                      final bool isOwn = (dm.isOwn ?? false) as bool;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Align(
-                        alignment:
-                          isOwn ? Alignment.centerRight : Alignment.centerLeft,
-                        child: ChatBubble(text: text, isOwn: isOwn),
-                        ),
-                      );
+                        final message = messages[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Align(
+                            alignment: message.senderId == 506064
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: ChatBubble(
+                              text: message.message,
+                              isOwn: message.senderId == 506064,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -351,6 +427,7 @@ class _MobileChatScreenState extends State<MobileChatScreen> {
                           hintText: 'Digite sua mensagem...',
                           onChanged: (value) {},
                           bottomMargin: 4,
+                          controller: messageController,
                           suffixIcon: IconButton(
                             tooltip: 'Enviar',
                             icon: const Icon(
@@ -358,15 +435,13 @@ class _MobileChatScreenState extends State<MobileChatScreen> {
                               size: 24,
                               color: Color.fromARGB(255, 45, 176, 194),
                             ),
-                            onPressed: () {
-                              // ação ao pressionar o ícone
-                            },
+                            onPressed: onSendMessage,
                           ),
+                          onSubmitted: (_) => onSendMessage(),
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 4),
                   Center(
                     child: RichText(
