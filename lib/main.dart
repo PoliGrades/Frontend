@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/src/chat_screen.dart';
+import 'package:polieats_frontend/src/data/User.dart';
+import 'package:polieats_frontend/src/helpers/api.dart';
+import 'package:polieats_frontend/src/login_screen.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
+
+final Api api = Api();
+late User currentUser;
 
 void main() {
   runApp(const MyApp());
