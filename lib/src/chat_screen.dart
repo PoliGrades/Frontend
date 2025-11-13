@@ -48,167 +48,187 @@ class DesktopChatScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return SafeArea(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // logo moved to top-right and enlarged
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Image.asset('assets/images/logo.png', width: 90, height: 90),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset('assets/images/shape_3.png', scale: 0.9),
-                const SizedBox(width: 12),
-                // pessoa ícone colocado aqui
-                Icon(Icons.person, size: 36, color: Colors.grey[700]),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: size.width,
-            height: size.height,
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(
-                top: 200,
-                start: 60,
-                end: 60,
-                bottom: 80,
-              ),
-              child: SizedBox(
-                width: size.width,
-                height: size.height,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Bem vindo ao\nPoliGrades',
-                            style: GoogleFonts.leagueSpartan(
-                              height: 1,
-                              fontSize: 52,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            child: Text(
-                              'A plataforma que facilita a gestão acadêmica 📚',
-                              style: GoogleFonts.leagueSpartan(
-                                fontSize: 24,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ),
-                        ],
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            // header
+            Positioned(
+              top: 30,
+              left: 40,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(
+                    tooltip: 'Voltar',
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      size: 32,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
+                  const SizedBox(width: 16),
+                  const Icon(
+                    Icons.account_circle,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 12),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'Prof. Calvetti',
+                      style: GoogleFonts.leagueSpartan(
+                        fontSize: 26,
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 50),
-                    SizedBox(
-                      width: 450,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          InputWithTile(
-                            title: '',
-                            hintText: 'Digite sua senha',
-                            onChanged: (value) {
-                              // Handle password change
-                            },
-                            isPassword: true,
-                          ),
-                          const SizedBox(height: 20),
-                          Button(
-                            text: 'Entrar',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          Center(
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text:
-                                        'Todas as mensagens enviadas são utilizadas de acordo com a nossa Política ',
-                                    style: GoogleFonts.leagueSpartan(
-                                      fontSize: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'Termos de Serviço',
-                                    style: GoogleFonts.leagueSpartan(
-                                      fontSize: 16,
-                                      color: Color.fromARGB(255, 45, 176, 194),
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PrivacyPolicyScreen(),
-                                          ),
-                                        );
-                                      },
-                                  ),
-                                  TextSpan(
-                                    text: ' e ',
-                                    style: GoogleFonts.leagueSpartan(
-                                      fontSize: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'Política de Privacidade.',
-                                    style: GoogleFonts.leagueSpartan(
-                                      fontSize: 16,
-                                      color: Color.fromARGB(255, 45, 176, 194),
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PrivacyPolicyScreen(),
-                                          ),
-                                        );
-                                      },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+
+            Positioned(
+              top: 110,
+              left: 0,
+              right: 0,
+              child: Container(height: 1, color: Colors.grey[300]),
+            ),
+
+            // conteúdo principal
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: size.width * 0.15,
+                vertical: 40,
+              ),
+              child: Column(
+                children: [
+                  const Spacer(),
+
+                  // mensagens
+                  Expanded(
+                    flex: 8,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(32),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: const [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: ChatBubble(
+                                text:
+                                    'Olá, bem-vindo ao chat! Em que posso ajudar?',
+                                isOwn: false,
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ChatBubble(
+                                text:
+                                    'está responsivo Alexandre',
+                                isOwn: true,
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: ChatBubble(
+                                text: 'Claro — diga qual dúvida você tem.',
+                                isOwn: false,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // campo de mensagem
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          style: GoogleFonts.leagueSpartan(fontSize: 18),
+                          decoration: InputDecoration(
+                            hintText: 'Digite sua mensagem...',
+                            hintStyle: GoogleFonts.leagueSpartan(
+                              color: Colors.grey[500],
+                              fontSize: 18,
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[100],
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 22,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      IconButton(
+                        tooltip: 'Enviar',
+                        icon: const Icon(
+                          Icons.send,
+                          size: 34,
+                          color: Color.fromARGB(255, 45, 176, 194),
+                        ),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // política de privacidade
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                              'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
+                          style: GoogleFonts.leagueSpartan(
+                            fontSize: 15,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Política de Privacidade.',
+                          style: GoogleFonts.leagueSpartan(
+                            fontSize: 15,
+                            color: const Color.fromARGB(255, 45, 176, 194),
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // ação ao clicar
+                            },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -397,16 +417,23 @@ class ChatBubble extends StatelessWidget {
       bottomRight: bottomRightRadius,
     );
 
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 260),
+      constraints: BoxConstraints(
+        maxWidth: screenWidth >= 800 ? screenWidth * 0.4 : 260,
+      ),
       child: ClipRRect(
         borderRadius: borderRadius,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(color: bgColor, borderRadius: borderRadius),
           child: Text(
             text,
-            style: GoogleFonts.leagueSpartan(fontSize: 14, color: textColor),
+            style: GoogleFonts.leagueSpartan(
+              fontSize: screenWidth >= 800 ? 18 : 14,
+              color: textColor,
+            ),
           ),
         ),
       ),
