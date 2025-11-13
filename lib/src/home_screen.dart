@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
+import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
@@ -702,6 +703,10 @@ class MobileHomeScreen extends StatelessWidget {
                 context,
               ).push(MaterialPageRoute(builder: (context) => ProfileScreen()));
               break;
+            case 4:
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => ChatScreen(professorID: 1234,)));
           }
         },
         items: const <BottomNavigationBarItem>[
@@ -712,6 +717,7 @@ class MobileHomeScreen extends StatelessWidget {
             label: 'Atividades',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         ],
       ),
     );

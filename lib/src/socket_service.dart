@@ -20,13 +20,9 @@ class SocketService {
   }
 
   SocketService() {
-    socket = io('http://localhost:3000', OptionBuilder()
+    socket = io('https://api.poligrades.matelz.dev', OptionBuilder()
       .setTransports(['websocket']) // for Flutter or Dart VM
       .disableAutoConnect()
       .build());
-
-    socket.io.options?['extraHeaders'] = {
-      'Authorization': 'Bearer 1234567890abcdef',
-    };
   }
 }
