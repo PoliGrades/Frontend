@@ -1,13 +1,20 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:polieats_frontend/src/data/Message.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
+import 'package:polieats_frontend/src/socket_service.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
 
+SocketService socketService = SocketService();
+
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  const ChatScreen({super.key, required this.professorID});
+
+  final int professorID;
+  static List<Message> messages = [];
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -23,9 +30,9 @@ class _ChatScreenState extends State<ChatScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return const DesktopChatScreen();
+            return DesktopChatScreen();
           } else {
-            return const MobileChatScreen();
+            return MobileChatScreen(professorID: widget.professorID);
           }
         },
       ),
@@ -207,11 +214,38 @@ class DesktopChatScreen extends StatelessWidget {
   }
 }
 
-class MobileChatScreen extends StatelessWidget {
-  const MobileChatScreen({super.key});
+class MobileChatScreen extends StatefulWidget {
+  const MobileChatScreen({super.key, required this.professorID});
+
+  final int professorID;
+  static const List<Message> messages = [];
 
   @override
+  _MobileChatScreenState createState() => _MobileChatScreenState();
+}
+
+class _MobileChatScreenState extends State<MobileChatScreen> {
+  @override
   Widget build(BuildContext context) {
+    socketService.addListener("previousMessages", (data) {
+      print("Previous Messages: $data");
+
+      // Parse and add previous messages to the list
+      List<Message> prevMessages = [];
+      if (data is List) {
+        for (var msgJson in data) {
+          final msg = Message.fromJson(Map<String, dynamic>.from(msgJson));
+          prevMessages.add(msg);
+        }
+      }
+
+      setState(() {
+        ChatScreen.messages = prevMessages;
+      });
+    });
+
+    socketService.emit("joinChat", [widget.professorID]);
+
     final size = MediaQuery.of(context).size;
 
     return SafeArea(
@@ -268,36 +302,25 @@ class MobileChatScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: ListView(
+                    Expanded(
+                    child: ListView.builder(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      children: const [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: ChatBubble(
-                            text:
-                                'Olá, bem-vindo ao chat! Em que posso ajudar?',
-                            isOwn: false,
-                          ),
+                      itemCount: MobileChatScreen.messages.length,
+                      itemBuilder: (context, index) {
+                      final m = MobileChatScreen.messages[index];
+                      final dynamic dm = m as dynamic;
+                      final String text =
+                        dm.text ?? dm.message ?? dm.content ?? m.toString();
+                      final bool isOwn = (dm.isOwn ?? false) as bool;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Align(
+                        alignment:
+                          isOwn ? Alignment.centerRight : Alignment.centerLeft,
+                        child: ChatBubble(text: text, isOwn: isOwn),
                         ),
-                        SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ChatBubble(
-                            text:
-                                'Olá Professor, preciso de ajuda com a avaliação.',
-                            isOwn: true,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: ChatBubble(
-                            text: 'Claro — diga qual dúvida você tem.',
-                            isOwn: false,
-                          ),
-                        ),
-                      ],
+                      );
+                      },
                     ),
                   ),
                   Row(
