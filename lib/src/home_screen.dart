@@ -800,18 +800,38 @@ class DesktopHomeScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(6)),
                         ),
+                        onTap: () {
+                        },
                       ),
                       ListTile(
                         leading: Icon(Icons.book),
                         title: Text('Matérias'),
+                        onTap: () {
+                        },
                       ),
                       ListTile(
                         leading: Icon(Icons.assignment),
                         title: Text('Atividades'),
+                        onTap: () {
+                        },
                       ),
                       ListTile(
                         leading: Icon(Icons.person),
                         title: Text('Perfil'),
+                        onTap: () {
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.chat),
+                        title: Text('Chat'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(professorID: 1234),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
