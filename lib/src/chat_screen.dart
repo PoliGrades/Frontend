@@ -22,6 +22,15 @@ class _ChatScreenState extends State<ChatScreen> {
   late SocketService socketService;
   List<Message> messages = [];
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -51,6 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           messages = prevMessages;
         });
+        _scrollToBottom();
       }
     });
 
@@ -64,6 +74,7 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           messages.add(newMsg);
         });
+        _scrollToBottom();
       } catch (e) {
         print('Error parsing new message: $e');
       }
@@ -84,6 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }]);
     
     _messageController.clear();
+    _scrollToBottom();
   }
 
   @override
@@ -92,6 +104,8 @@ class _ChatScreenState extends State<ChatScreen> {
     socketService.removeListener("previousMessages");
     socketService.removeListener("newMessage");
     _messageController.dispose();
+    _scrollController.dispose();
+
     super.dispose();
   }
 
@@ -106,12 +120,14 @@ class _ChatScreenState extends State<ChatScreen> {
               messages: messages,
               messageController: _messageController,
               onSendMessage: _sendMessage,
+              scrollController: _scrollController,
             );
           } else {
             return MobileChatScreen(
               messages: messages,
               messageController: _messageController,
               onSendMessage: _sendMessage,
+              scrollController: _scrollController,
             );
           }
         },
@@ -124,12 +140,14 @@ class DesktopChatScreen extends StatelessWidget {
   final List<Message> messages;
   final TextEditingController messageController;
   final VoidCallback onSendMessage;
+  final ScrollController scrollController;
 
   const DesktopChatScreen({
     super.key,
     required this.messages,
     required this.messageController,
     required this.onSendMessage,
+    required this.scrollController,
   });
 
   @override
@@ -196,7 +214,7 @@ class DesktopChatScreen extends StatelessWidget {
               child: Column(
                 children: [
                   const Spacer(),
-
+                  
                   // mensagens
                   Expanded(
                     flex: 8,
@@ -208,6 +226,7 @@ class DesktopChatScreen extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.all(32),
                       child: SingleChildScrollView(
+                        controller: scrollController,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -323,12 +342,14 @@ class MobileChatScreen extends StatelessWidget {
   final List<Message> messages;
   final TextEditingController messageController;
   final VoidCallback onSendMessage;
+  final ScrollController scrollController;
 
   const MobileChatScreen({
     super.key,
     required this.messages,
     required this.messageController,
     required this.onSendMessage,
+    required this.scrollController,
   });
 
   @override
@@ -391,6 +412,7 @@ class MobileChatScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ListView.builder(
+                      controller: scrollController,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
