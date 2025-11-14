@@ -8,7 +8,6 @@ import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 
 final Api api = Api();
 late User currentUser;
-
 void main() {
   runApp(const MyApp());
 }

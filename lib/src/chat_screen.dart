@@ -1,10 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/data/Message.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/socket_service.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
+
+import '../main.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key, required this.professorID});
@@ -57,6 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
       
       try {
         final newMsg = Message.fromJson(Map<String, dynamic>.from(data));
+
         setState(() {
           messages.add(newMsg);
         });
@@ -73,20 +77,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    final newMessage = Message(
-      roomId: 'room_${widget.professorID}',
-      senderId: 506064, // Example user ID
-      senderName: 'Aluno Exemplo',
-      senderRole: 'student',
-      message: text,
-      timestamp: DateTime.now(),
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-
-    setState(() {
-      messages.add(newMessage);
-    });
-
     // Send message via socket
     socketService.emit("sendMessage", [{
       'professorID': widget.professorID,
@@ -96,14 +86,14 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
   }
 
-  // @override
-  // void dispose() {
-  //   socketService.disconnect();
-  //   socketService.removeListener("previousMessages");
-  //   socketService.removeListener("newMessage");
-  //   _messageController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    socketService.disconnect();
+    socketService.removeListener("previousMessages");
+    socketService.removeListener("newMessage");
+    _messageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -224,12 +214,13 @@ class DesktopChatScreen extends StatelessWidget {
                             ...messages.map((message) => Padding(
                                   padding: const EdgeInsets.only(bottom: 24),
                                   child: Align(
-                                    alignment: message.senderId == 506064
+                                    alignment: message.senderId == currentUser.id
                                         ? Alignment.centerRight
                                         : Alignment.centerLeft,
                                     child: ChatBubble(
                                       text: message.message,
-                                      isOwn: message.senderId == 506064,
+                                      timestamp: message.timestamp,
+                                      isOwn: message.senderId == currentUser.id,
                                     ),
                                   ),
                                 )),
@@ -407,12 +398,13 @@ class MobileChatScreen extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Align(
-                            alignment: message.senderId == 506064
+                            alignment: message.senderId == currentUser.id
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
                             child: ChatBubble(
                               text: message.message,
-                              isOwn: message.senderId == 506064,
+                              timestamp: message.timestamp,
+                              isOwn: message.senderId == currentUser.id,
                             ),
                           ),
                         );
@@ -473,13 +465,16 @@ class MobileChatScreen extends StatelessWidget {
 class ChatBubble extends StatelessWidget {
   final String text;
   final bool isOwn;
+  final DateTime timestamp;
 
-  const ChatBubble({super.key, required this.text, this.isOwn = true});
+  const ChatBubble({super.key, required this.text, required this.timestamp, this.isOwn = true});
 
   @override
   Widget build(BuildContext context) {
+    final f = DateFormat('dd/MM/yyyy - HH:mm', 'pt_BR');
     final bgColor = isOwn ? const Color(0xFF42C9DC) : Colors.grey[200];
-    final textColor = isOwn ? Colors.white : Colors.black87;
+    final textColor = isOwn ? Colors.white : const Color.fromARGB(221, 0, 0, 0);
+    final timeColor = isOwn ? Colors.white70 : Colors.grey[600];
 
     const corner = Radius.circular(16);
     final bottomLeftRadius = isOwn ? corner : Radius.zero;
@@ -493,6 +488,9 @@ class ChatBubble extends StatelessWidget {
     );
 
     final screenWidth = MediaQuery.of(context).size.width;
+    final messageFontSize = screenWidth >= 800 ? 18.0 : 14.0;
+    final timeFontSize = screenWidth >= 800 ? 12.0 : 10.0;
+    final timeString = f.format(timestamp.toLocal());
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -503,12 +501,26 @@ class ChatBubble extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(color: bgColor, borderRadius: borderRadius),
-          child: Text(
-            text,
-            style: GoogleFonts.leagueSpartan(
-              fontSize: screenWidth >= 800 ? 18 : 14,
-              color: textColor,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: isOwn ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Text(
+                text,
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: messageFontSize,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                timeString,
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: timeFontSize,
+                  color: timeColor,
+                ),
+              ),
+            ],
           ),
         ),
       ),

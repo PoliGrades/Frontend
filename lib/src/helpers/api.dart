@@ -36,7 +36,7 @@ class Api {
     currentUser = User(
       email: data['email'].toString(),
       name: data['name'].toString(),
-      id: data['id'].toString(),
+      id: data['id'],
       role: data['role'].toString(),
     );
 

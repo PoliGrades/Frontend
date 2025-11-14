@@ -1,7 +1,7 @@
 class User {
   String email;
   String name;
-  String id;
+  int id;
   String role;
 
   User({

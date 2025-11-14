@@ -11,8 +11,16 @@ class SocketService {
     socket.connect();
   }
 
+  disconnect() {
+    socket.disconnect();
+  }
+
   addListener(String eventName, Function(dynamic) callback) {
     socket.on(eventName, callback);
+  }
+
+  removeListener(String eventName) {
+    socket.off(eventName);
   }
 
   emit(String eventName, List<dynamic> args) {
