@@ -11,6 +11,7 @@ import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';        
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.user});
@@ -831,7 +832,7 @@ class DesktopHomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),),
+                              builder: (context) => SelectProfessorScreen(),
                             ),
                           );
                         },

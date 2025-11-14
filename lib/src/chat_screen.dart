@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/data/Message.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
+import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/socket_service.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
 
@@ -91,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     // Send message via socket
     socketService.emit("sendMessage", [{
-      'recipientID': widget.recipient.id,
+      'professorID': widget.recipient.id,
       'message': text,
     }]);
     
@@ -162,15 +163,15 @@ class DesktopChatScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
-        backgroundColor: Color.fromARGB(255, 245, 250, 251,),
+        backgroundColor: const Color.fromARGB(255, 245, 250, 251),
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset('assets/images/logo.png', width: 40, height: 40),
             Container(
-              margin: EdgeInsets.only(left: 20),
-              decoration: BoxDecoration(
+              margin: const EdgeInsets.only(left: 20),
+              decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(100)),
                 color: Color.fromARGB(255, 45, 176, 194),
                 boxShadow: [
@@ -182,7 +183,7 @@ class DesktopChatScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: CircleAvatar(
+              child: const CircleAvatar(
                 radius: 20,
                 backgroundColor: Colors.transparent,
                 child: Icon(Icons.person, size: 20, color: Colors.white),
@@ -193,47 +194,53 @@ class DesktopChatScreen extends StatelessWidget {
       ),
       body: Row(
         children: [
-          // Menu lateral
           SizedBox(
             width: size.width * 0.20,
             child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(Icons.home),
-                    title: Text('Início'),
-                    onTap: () => Navigator.of(context).maybePop(),
-                    shape: RoundedRectangleBorder(
+                    leading: const Icon(Icons.home),
+                    title: const Text('Início'),
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(user: currentUser),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(6)),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ListTile(
-                    leading: Icon(Icons.book),
-                    title: Text('Matérias'),
+                    leading: const Icon(Icons.book),
+                    title: const Text('Matérias'),
                     onTap: () {},
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ListTile(
-                    leading: Icon(Icons.assignment),
-                    title: Text('Atividades'),
+                    leading: const Icon(Icons.assignment),
+                    title: const Text('Atividades'),
                     onTap: () {},
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('Perfil'),
+                    leading: const Icon(Icons.person),
+                    title: const Text('Perfil'),
                     onTap: () {},
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ListTile(
-                    leading: Icon(Icons.chat),
+                    leading: const Icon(Icons.chat),
                     selected: true,
-                    selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+                    selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
                     selectedColor: Colors.white,
-                    title: Text('Chat'),
-                    shape: RoundedRectangleBorder(
+                    title: const Text('Chat'),
+                    shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(6)),
                     ),
                     onTap: () {},
@@ -242,8 +249,6 @@ class DesktopChatScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // LINHA VERTICAL
           SizedBox(
             width: 20,
             child: Center(
@@ -254,19 +259,28 @@ class DesktopChatScreen extends StatelessWidget {
               ),
             ),
           ),
-
+          
           // Área do chat
           Expanded(
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.only(
+                  padding: const EdgeInsets.only(
                       left: 40, right: 40, top: 10, bottom: 10),
                   child: Row(
                     children: [
-                      SizedBox(width: 16),
-                      Icon(Icons.account_circle, size: 60, color: Colors.grey),
-                      SizedBox(width: 12),
+                      IconButton(
+                        tooltip: 'Voltar',
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          size: 32,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(Icons.account_circle, size: 60, color: Colors.grey),
+                      const SizedBox(width: 12),
                       Text(
                         'Prof. ${recipient.name}',
                         style: GoogleFonts.leagueSpartan(
@@ -296,7 +310,7 @@ class DesktopChatScreen extends StatelessWidget {
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            padding: EdgeInsets.all(32),
+                            padding: const EdgeInsets.all(32),
                             child: SingleChildScrollView(
                               controller: scrollController,
                               child: Column(
@@ -304,9 +318,9 @@ class DesktopChatScreen extends StatelessWidget {
                                 children: [
                                   ...messages.map(
                                     (message) => Padding(
-                                      padding: EdgeInsets.only(bottom: 24),
+                                      padding: const EdgeInsets.only(bottom: 24),
                                       child: Align(
-                                        alignment: message.senderId ==
+                                        alignment: message.senderId == 
                                                 currentUser.id
                                             ? Alignment.centerRight
                                             : Alignment.centerLeft,
@@ -324,9 +338,7 @@ class DesktopChatScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-
-                        SizedBox(height: 30),
-
+                        const SizedBox(height: 30),
                         // campo de mensagem
                         Row(
                           children: [
@@ -342,7 +354,7 @@ class DesktopChatScreen extends StatelessWidget {
                                   ),
                                   filled: true,
                                   fillColor: Colors.grey[100],
-                                  contentPadding: EdgeInsets.symmetric(
+                                  contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 24,
                                     vertical: 22,
                                   ),
@@ -354,9 +366,9 @@ class DesktopChatScreen extends StatelessWidget {
                                 onSubmitted: (_) => onSendMessage(),
                               ),
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             IconButton(
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.send,
                                 size: 34,
                                 color: Color.fromARGB(255, 45, 176, 194),
@@ -365,45 +377,45 @@ class DesktopChatScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-
-                        SizedBox(height: 10),
-
-                        // política de privacidade
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text:
-                                    'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
-                                style: GoogleFonts.leagueSpartan(
-                                  fontSize: 15,
-                                  color: Colors.grey[600],
+                        const SizedBox(height: 10),
+                        Center(
+                          // politica de privacidade
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text:
+                                      'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
+                                  style: GoogleFonts.leagueSpartan(
+                                    fontSize: 15,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: 'Política de Privacidade.',
-                                style: GoogleFonts.leagueSpartan(
-                                  fontSize: 15,
-                                  color: Color.fromARGB(255, 45, 176, 194),
-                                  decoration: TextDecoration.underline,
+                                TextSpan(
+                                  text: 'Política de Privacidade.',
+                                  style: GoogleFonts.leagueSpartan(
+                                    fontSize: 15,
+                                    color: const Color.fromARGB(255, 45, 176, 194),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PrivacyPolicyScreen(),
+                                        ),
+                                      );
+                                    },
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PrivacyPolicyScreen(),
-                                      ),
-                                    );
-                                  },
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-
-                        SizedBox(height: 20),
+                        
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
