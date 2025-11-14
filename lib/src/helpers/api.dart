@@ -42,4 +42,27 @@ class Api {
 
     return currentUser;
   }
+
+  Future<List<User>> fetchProfessors() async {
+    final response = await dio.get(
+      '/professors',
+      options: Options(
+        validateStatus: (status) => status == 200 || status == 500 || status == 401,
+      )
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch professors: ${response.statusCode}');
+    }
+
+    List<dynamic> data = response.data;
+    List<User> professors = data.map((prof) => User(
+      email: prof['email'].toString(),
+      name: prof['name'].toString(),
+      id: prof['id'],
+      role: prof['role'].toString(),
+    )).toList();
+
+    return professors;
+  }
 }
