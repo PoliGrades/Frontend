@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale('pt', 'BR')],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.from(alpha: 255, red: 45, green: 176, blue: 194),
+          seedColor: Color.fromARGB(255, 45, 176, 194),
         ),
         fontFamily: GoogleFonts.leagueSpartan().fontFamily,
       ),

@@ -154,185 +154,259 @@ class DesktopChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          alignment: Alignment.center,
+    return Scaffold(
+      appBar: AppBar(
+        scrolledUnderElevation: 0.0,
+        backgroundColor: Color.fromARGB(255, 245, 250, 251,),
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // header
-            Positioned(
-              top: 30,
-              left: 40,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    tooltip: 'Voltar',
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      size: 32,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                  const SizedBox(width: 16),
-                  const Icon(
-                    Icons.account_circle,
-                    size: 60,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(width: 12),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      'Prof. Calvetti',
-                      style: GoogleFonts.leagueSpartan(
-                        fontSize: 26,
-                        color: Colors.grey[800],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+            Image.asset('assets/images/logo.png', width: 40, height: 40),
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(100)),
+                color: Color.fromARGB(255, 45, 176, 194),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white,
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 0),
                   ),
                 ],
               ),
-            ),
-
-            Positioned(
-              top: 110,
-              left: 0,
-              right: 0,
-              child: Container(height: 1, color: Colors.grey[300]),
-            ),
-
-            // conteúdo principal
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: size.width * 0.15,
-                vertical: 40,
-              ),
-              child: Column(
-                children: [
-                  const Spacer(),
-                  
-                  // mensagens
-                  Expanded(
-                    flex: 8,
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.all(32),
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            ...messages.map((message) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 24),
-                                  child: Align(
-                                    alignment: message.senderId == currentUser.id
-                                        ? Alignment.centerRight
-                                        : Alignment.centerLeft,
-                                    child: ChatBubble(
-                                      text: message.message,
-                                      timestamp: message.timestamp,
-                                      isOwn: message.senderId == currentUser.id,
-                                    ),
-                                  ),
-                                )),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // campo de mensagem
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: messageController,
-                          style: GoogleFonts.leagueSpartan(fontSize: 18),
-                          decoration: InputDecoration(
-                            hintText: 'Digite sua mensagem...',
-                            hintStyle: GoogleFonts.leagueSpartan(
-                              color: Colors.grey[500],
-                              fontSize: 18,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 22,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                          onSubmitted: (_) => onSendMessage(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      IconButton(
-                        tooltip: 'Enviar',
-                        icon: const Icon(
-                          Icons.send,
-                          size: 34,
-                          color: Color.fromARGB(255, 45, 176, 194),
-                        ),
-                        onPressed: onSendMessage,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // política de privacidade
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text:
-                              'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
-                          style: GoogleFonts.leagueSpartan(
-                            fontSize: 15,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'Política de Privacidade.',
-                          style: GoogleFonts.leagueSpartan(
-                            fontSize: 15,
-                            color: const Color.fromARGB(255, 45, 176, 194),
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const PrivacyPolicyScreen(),
-                                ),
-                              );
-                            },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.transparent,
+                child: Icon(Icons.person, size: 20, color: Colors.white),
               ),
             ),
           ],
         ),
+      ),
+      body: Row(
+        children: [
+          // Menu lateral
+          SizedBox(
+            width: size.width * 0.20,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.home),
+                    title: Text('Início'),
+                    onTap: () => Navigator.of(context).maybePop(),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ListTile(
+                    leading: Icon(Icons.book),
+                    title: Text('Matérias'),
+                    onTap: () {},
+                  ),
+                  SizedBox(height: 20),
+                  ListTile(
+                    leading: Icon(Icons.assignment),
+                    title: Text('Atividades'),
+                    onTap: () {},
+                  ),
+                  SizedBox(height: 20),
+                  ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('Perfil'),
+                    onTap: () {},
+                  ),
+                  SizedBox(height: 20),
+                  ListTile(
+                    leading: Icon(Icons.chat),
+                    selected: true,
+                    selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+                    selectedColor: Colors.white,
+                    title: Text('Chat'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
+                    ),
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // LINHA VERTICAL
+          SizedBox(
+            width: 20,
+            child: Center(
+              child: Container(
+                width: 1,
+                height: double.infinity,
+                color: Colors.grey.shade300,
+              ),
+            ),
+          ),
+
+          // Área do chat
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                      left: 40, right: 40, top: 10, bottom: 10),
+                  child: Row(
+                    children: [
+                      SizedBox(width: 16),
+                      Icon(Icons.account_circle, size: 60, color: Colors.grey),
+                      SizedBox(width: 12),
+                      Text(
+                        'Prof. Calvetti',
+                        style: GoogleFonts.leagueSpartan(
+                          fontSize: 26,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(height: 1, color: Colors.grey[300]),
+
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: size.width * 0.08,
+                      vertical: 40,
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.all(32),
+                            child: SingleChildScrollView(
+                              controller: scrollController,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  ...messages.map(
+                                    (message) => Padding(
+                                      padding: EdgeInsets.only(bottom: 24),
+                                      child: Align(
+                                        alignment: message.senderId ==
+                                                currentUser.id
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                        child: ChatBubble(
+                                          text: message.message,
+                                          timestamp: message.timestamp,
+                                          isOwn: message.senderId ==
+                                              currentUser.id,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 30),
+
+                        // campo de mensagem
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: messageController,
+                                style: GoogleFonts.leagueSpartan(fontSize: 18),
+                                decoration: InputDecoration(
+                                  hintText: 'Digite sua mensagem...',
+                                  hintStyle: GoogleFonts.leagueSpartan(
+                                    color: Colors.grey[500],
+                                    fontSize: 18,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 22,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                onSubmitted: (_) => onSendMessage(),
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            IconButton(
+                              icon: Icon(
+                                Icons.send,
+                                size: 34,
+                                color: Color.fromARGB(255, 45, 176, 194),
+                              ),
+                              onPressed: onSendMessage,
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 10),
+
+                        // política de privacidade
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 15,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Política de Privacidade.',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 15,
+                                  color: Color.fromARGB(255, 45, 176, 194),
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PrivacyPolicyScreen(),
+                                      ),
+                                    );
+                                  },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
