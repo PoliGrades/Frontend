@@ -1,10 +1,13 @@
 
 
+
+
 class Attachment {
   final String fileName;
   final String filePath;
+  final List<int> fileBytes;
 
-  Attachment({required this.fileName, required this.filePath});
+  Attachment({required this.fileName, required this.filePath, required this.fileBytes});
 }
 
 class Assignment {
@@ -36,10 +39,12 @@ class Assignments {
       Attachment(
       fileName: 'math_homework.pdf',
       filePath: 'path/to/math_homework.pdf',
+      fileBytes: List.empty()
     ),
       Attachment(
       fileName: 'formulas_sheet.pdf',
       filePath: 'path/to/formulas_sheet.pdf',
+      fileBytes: List.empty()
     ),
   ],
   ),
@@ -52,6 +57,7 @@ class Assignments {
       Attachment(
         fileName: 'linear_algebra_reading.pdf',
         filePath: 'path/to/linear_algebra_reading.pdf',
+        fileBytes: List.empty(),
       ),
     ],
   ),
@@ -63,6 +69,7 @@ class Assignments {
     attachments: [Attachment(
       fileName: 'science_project_instructions.pdf',
       filePath: 'path/to/science_project_instructions.pdf',
+      fileBytes: List.empty(),
     )],
   ),
   Assignment(
@@ -74,6 +81,7 @@ class Assignments {
     [Attachment(
       fileName: 'french_revolution_guidelines.pdf',
       filePath: 'path/to/french_revolution_guidelines.pdf',
+      fileBytes: List.empty(),
     )],
   ),
 ];

@@ -1,13 +1,16 @@
+import 'dart:convert';
+
 import 'package:dio/browser.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 
 class Api {
-  final String baseUrl = 'https://api.poligrades.matelz.dev';
+  final String baseUrl = 'http://localhost:3000';
   late Dio dio;
   late BrowserHttpClientAdapter httpClientAdapter;
 
@@ -147,5 +150,30 @@ class Api {
     }).toList();
 
     return courses;
+  }
+  
+  void createAssignment(String title, String description, DateTime dueDate, int classId, List<Attachment> attachments) async {
+    final formData = FormData.fromMap({
+      'attachments': attachments.map((attachment) => MultipartFile.fromBytes(attachment.fileBytes, filename: attachment.fileName)).toList(),
+      'body': jsonEncode({
+        'classId': classId,
+        'title': title,
+        'description': description,
+        'dueDate': dueDate.toIso8601String(),
+      })
+    });
+
+    final response = await dio.post(
+      '/task',
+      data: formData,
+      options: Options(
+        validateStatus: (status) => status == 201 || status == 400 || status == 401 || status == 200,
+        contentType: 'multipart/form-data',
+      )
+    );
+
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      throw Exception('Failed to create assignment: ${response.statusCode}');
+    }
   }
 }
