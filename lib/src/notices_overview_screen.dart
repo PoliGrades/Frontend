@@ -10,12 +10,12 @@ class NoticesOverviewScreen extends StatefulWidget {
 
 class _NoticesOverviewScreen extends State<NoticesOverviewScreen> {
   final noticesController = Notices();
-  late final List<Notice> noticesList;
+  late final List<Notice> notices;
 
   @override
   void initState() {
     super.initState();
-    noticesList = noticesController.allNotices;
+    notices = noticesController.allNotices;
   }
 
   @override
@@ -25,9 +25,9 @@ class _NoticesOverviewScreen extends State<NoticesOverviewScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return DesktopNoticesOverview(noticesList: noticesList);
+            return DesktopNoticesOverview(notices: notices);
           } else {
-            return MobileNoticesOverview(noticesList: noticesList);
+            return MobileNoticesOverview(notices: notices);
           }
         },
       ),
@@ -36,15 +36,15 @@ class _NoticesOverviewScreen extends State<NoticesOverviewScreen> {
 }
 
 class MobileNoticesOverview extends StatelessWidget {
-  final List<Notice> noticesList;
-  const MobileNoticesOverview({super.key, required this.noticesList});
+  final List<Notice> notices;
+  const MobileNoticesOverview({super.key, required this.notices});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Teste Mobile',
+          'Meus Avisos',
           style: TextStyle(
             fontFamily: GoogleFonts.leagueSpartan().fontFamily,
             fontWeight: FontWeight.bold,
@@ -58,9 +58,9 @@ class MobileNoticesOverview extends StatelessWidget {
 }
 
 class DesktopNoticesOverview extends StatelessWidget {
-  const DesktopNoticesOverview({super.key, required this.noticesList});
+  const DesktopNoticesOverview({super.key, required this.notices});
 
-  final List<Notice> noticesList;
+  final List<Notice> notices;
 
   @override
   Widget build(BuildContext context) {
