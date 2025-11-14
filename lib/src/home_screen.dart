@@ -6,16 +6,15 @@ import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
-import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
-import 'package:polieats_frontend/src/data/User.dart';
+import 'package:polieats_frontend/src/helpers/icon_map.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.user});
+import '../main.dart';
 
-  final User user;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,8 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final size = MediaQuery.of(context).size;
     final f = DateFormat('dd/MM/yyyy', 'pt_BR');
 
-    final coursesController = Courses();
-    final courses = coursesController.allCourses;
+    final courses = globals.courseController.allCourses;
 
     final noticesController = Notices();
     final notices = noticesController.notices;
@@ -43,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return DesktopHomeScreen(currentUser: widget.user);
+            return DesktopHomeScreen();
           } else {
-            return MobileHomeScreen(currentUser: widget.user);
+            return MobileHomeScreen();
           }
         },
       ),
@@ -54,9 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class MobileHomeScreen extends StatelessWidget {
-  const MobileHomeScreen({super.key, required this.currentUser});
-
-  final User currentUser;
+  const MobileHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +60,7 @@ class MobileHomeScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final f = DateFormat('dd/MM/yyyy', 'pt_BR');
 
-    final coursesController = Courses();
-    final courses = coursesController.allCourses;
+    final courses = globals.courseController.allCourses;
 
     final noticesController = Notices();
     final notices = noticesController.notices;
@@ -97,7 +92,7 @@ class MobileHomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Boas-vindas ${currentUser.name.split(" ")[0]}!",
+                            "Boas-vindas ${globals.currentUser.name.split(" ")[0]}!",
                             style: TextStyle(
                               fontFamily:
                                   GoogleFonts.leagueSpartan().fontFamily,
@@ -225,7 +220,7 @@ class MobileHomeScreen extends StatelessWidget {
                                           color: course.accentColor,
                                         ),
                                         child: Icon(
-                                          course.icon,
+                                          iconMap[course.name] ?? Icons.help,
                                           size: 30,
                                           color: course.color,
                                         ),
@@ -303,7 +298,7 @@ class MobileHomeScreen extends StatelessWidget {
                           },
                           itemBuilder: (context, index) {
                             final assignment = assignments[index];
-                            final course = coursesController.getCourseByName(
+                            final course = globals.courseController.getCourseByName(
                               assignment.course,
                             );
 
@@ -375,7 +370,7 @@ class MobileHomeScreen extends StatelessWidget {
                                               bottom: -12,
                                               right: 8,
                                               child: Icon(
-                                                course.icon,
+                                                iconMap[course.name] ?? Icons.help,
                                                 size: 64,
                                                 color: Colors.white,
                                               ),
@@ -475,7 +470,7 @@ class MobileHomeScreen extends StatelessWidget {
                           },
                           itemBuilder: (context, index) {
                             final notice = notices[index];
-                            final course = coursesController.getCourseByName(
+                            final course = globals.courseController.getCourseByName(
                               notice.course,
                             );
 
@@ -515,7 +510,7 @@ class MobileHomeScreen extends StatelessWidget {
                                                   color: course!.accentColor,
                                                 ),
                                                 child: Icon(
-                                                  course.icon,
+                                                  iconMap[course.name] ?? Icons.help,
                                                   size: 20,
                                                   color: course.color,
                                                 ),
@@ -600,7 +595,7 @@ class MobileHomeScreen extends StatelessWidget {
                                                       color: course.accentColor,
                                                     ),
                                                     child: Icon(
-                                                      course.icon,
+                                                      iconMap[course.name] ?? Icons.help,
                                                       size: 30,
                                                       color: course.color,
                                                     ),
@@ -725,9 +720,7 @@ class MobileHomeScreen extends StatelessWidget {
 }
 
 class DesktopHomeScreen extends StatelessWidget {
-  const DesktopHomeScreen({super.key, required this.currentUser});
-
-  final User currentUser;
+  const DesktopHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -739,8 +732,7 @@ class DesktopHomeScreen extends StatelessWidget {
       seedColor: Color.fromARGB(255, 45, 176, 194),
     );
 
-    final coursesController = Courses();
-    final courses = coursesController.allCourses;
+    final courses = globals.courseController.allCourses;
 
     final assignmentsController = Assignments();
     final assignments = assignmentsController.assignments;
@@ -857,7 +849,7 @@ class DesktopHomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bem-vindo de volta, ${currentUser.name.split(" ")[0]}!',
+                        'Bem-vindo de volta, ${globals.currentUser.name.split(" ")[0]}!',
                         style: TextStyle(
                           fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                           fontSize: 24,
@@ -947,7 +939,7 @@ class DesktopHomeScreen extends StatelessWidget {
                                                       color: course.accentColor,
                                                     ),
                                                     child: Icon(
-                                                      course.icon,
+                                                      iconMap[course.name] ?? Icons.help,
                                                       size: 30,
                                                       color: course.color,
                                                     ),
@@ -1069,8 +1061,7 @@ class AssignmentDataSource extends CalendarDataSource {
   @override
   Color getColor(int index) {
     final assignment = appointments![index] as Assignment;
-    final coursesController = Courses();
-    final course = coursesController.getCourseByName(assignment.course);
+    final course = globals.courseController.getCourseByName(assignment.course);
     return course!.color;
   }
 }

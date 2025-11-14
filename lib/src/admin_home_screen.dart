@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/create_assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
-import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
-import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/helpers/icon_map.dart';
+import 'package:polieats_frontend/src/widgets/home_screen_scaffold.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -18,9 +19,13 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   String selectedCourse = 'Matemática';
-  final coursesController = Courses();
   final noticesController = Notices();
   final assignmentsController = Assignments();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     final size = MediaQuery.of(context).size;
     final f = DateFormat('dd/MM/yyyy', 'pt_BR');
 
-    var courses = coursesController.getCourseByName(selectedCourse);
+    var courses = globals.courseController.getCourseByName(selectedCourse);
     var notices = noticesController.getNoticesForCourse(selectedCourse);
     var assignments = assignmentsController.getAssignmentsForCourse(
       courses!.name,
@@ -38,8 +43,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     var color = courses.color;
     var accentColor = courses.accentColor;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return HomeScreenScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -58,7 +62,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Boas-vindas João!",
+                            "Boas-vindas ${globals.currentUser.name.split(" ")[0]}!",
                             style: TextStyle(
                               fontFamily:
                                   GoogleFonts.leagueSpartan().fontFamily,
@@ -81,48 +85,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             enableSearch: false,
                             initialSelection: selectedCourse,
                             dropdownMenuEntries: <DropdownMenuEntry<String>>[
-                              DropdownMenuEntry<String>(
-                                value: 'Matemática',
-                                label: 'Matemática',
-                                style: ButtonStyle(
-                                  textStyle: WidgetStatePropertyAll(
-                                    TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                    ),
-                                  ),
+                              for (var course in globals.courseController.allCourses)
+                                DropdownMenuEntry<String>(
+                                  value: course.name,
+                                  label: course.name,
                                 ),
-                              ),
-                              DropdownMenuEntry<String>(
-                                value: 'Biologia',
-                                label: 'Biologia',
-                                style: ButtonStyle(
-                                  textStyle: WidgetStatePropertyAll(
-                                    TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              DropdownMenuEntry<String>(
-                                value: 'História',
-                                label: 'História',
-                                style: ButtonStyle(
-                                  textStyle: WidgetStatePropertyAll(
-                                    TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ],
-                            onSelected: (String? value) {
-                              setState(() {
-                                selectedCourse = value!;
-                              });
-                            },
                           ),
                         ],
                       ),
@@ -180,7 +148,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CreateAssignmentScreen(),
+                                  builder: (context) =>
+                                      CreateAssignmentScreen(),
                                 ),
                               );
                             },
@@ -204,7 +173,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                           },
                           itemBuilder: (context, index) {
                             final assignment = assignments[index];
-                            final course = coursesController.getCourseByName(
+                            final course = globals.courseController.getCourseByName(
                               assignment.course,
                             );
 
@@ -276,7 +245,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                               bottom: -12,
                                               right: 8,
                                               child: Icon(
-                                                course.icon,
+                                                iconMap[course.name] ?? Icons.help,
                                                 size: 64,
                                                 color: Colors.white,
                                               ),
@@ -376,7 +345,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                           },
                           itemBuilder: (context, index) {
                             final assignment = assignments[index];
-                            final course = coursesController.getCourseByName(
+                            final course = globals.courseController.getCourseByName(
                               assignment.course,
                             );
 
@@ -448,7 +417,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                               bottom: -12,
                                               right: 8,
                                               child: Icon(
-                                                course.icon,
+                                                iconMap[course.name] ??
+                                                    Icons.help,
                                                 size: 64,
                                                 color: Colors.white,
                                               ),
@@ -598,7 +568,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                               fontSize: 12,
                                               color: Colors.grey.shade400,
                                             ),
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -657,7 +627,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                           },
                           itemBuilder: (context, index) {
                             final notice = notices[index];
-                            final course = coursesController.getCourseByName(
+                            final course = globals.courseController.getCourseByName(
                               notice.course,
                             );
 
@@ -697,7 +667,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                                   color: course!.accentColor,
                                                 ),
                                                 child: Icon(
-                                                  course.icon,
+                                                  iconMap[course.name] ?? Icons.help,
                                                   size: 20,
                                                   color: course.color,
                                                 ),
@@ -782,7 +752,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                                       color: course.accentColor,
                                                     ),
                                                     child: Icon(
-                                                      course.icon,
+                                                      iconMap[course.name] ?? Icons.help,
                                                       size: 30,
                                                       color: course.color,
                                                     ),
@@ -858,44 +828,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        iconSize: 24,
-        selectedItemColor: Colors.blue,
-        selectedLabelStyle: TextStyle(
-          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-          fontSize: 12,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-          fontSize: 12,
-        ),
-        onTap: (value) {
-          switch (value) {
-            case 0:
-              break;
-            case 1:
-              break;
-            case 2:
-              break;
-            case 3:
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (context) => ProfileScreen()));
-              break;
-          }
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Alunos',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
       ),
     );
   }

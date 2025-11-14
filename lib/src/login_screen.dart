@@ -176,7 +176,7 @@ class DesktopLoginScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        HomeScreen(user: user),
+                                        HomeScreen(),
                                   ),
                                 );
                               })
@@ -387,7 +387,7 @@ class MobileLoginScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        HomeScreen(user: user),
+                                        HomeScreen(),
                                   ),
                                 );
                               })

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
-import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Grades.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 
@@ -25,8 +25,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
       widget.assignment.title,
     );
 
-    final coursesController = Courses();
-    final course = coursesController.getCourseByName(
+    final course = globals.courseController.getCourseByName(
       widget.assignment.course,
     );
 

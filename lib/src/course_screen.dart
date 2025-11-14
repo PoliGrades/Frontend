@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Grades.dart';
+import 'package:polieats_frontend/src/helpers/icon_map.dart';
 
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key, required this.course});
@@ -65,7 +66,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                   color: widget.course.accentColor,
                                 ),
                                 child: Icon(
-                                  widget.course.icon,
+                                  iconMap[widget.course.name] ?? Icons.help,
                                   size: 35,
                                   color: widget.course.color,
                                 ),
@@ -83,7 +84,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                     ),
                                   ),
                                   Text(
-                                    "Docente: ${widget.course.instructor}",
+                                    "Docente: teste",
                                     style: TextStyle(
                                       fontFamily: GoogleFonts.leagueSpartan()
                                           .fontFamily,
@@ -181,7 +182,7 @@ class _CourseScreenState extends State<CourseScreen> {
                                           bottom: -12,
                                           right: 8,
                                           child: Icon(
-                                            widget.course.icon,
+                                            iconMap[widget.course.name] ?? Icons.help,
                                             size: 64,
                                             color: Colors.white,
                                           ),
