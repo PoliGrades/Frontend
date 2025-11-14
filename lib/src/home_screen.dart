@@ -706,7 +706,7 @@ class MobileHomeScreen extends StatelessWidget {
             case 4:
               Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (context) => ChatScreen(professorID: 1234,)));
+              ).push(MaterialPageRoute(builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),)));
           }
         },
         items: const <BottomNavigationBarItem>[
@@ -831,7 +831,7 @@ class DesktopHomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(professorID: 1234),
+                              builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),),
                             ),
                           );
                         },

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/data/Message.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/socket_service.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
@@ -10,9 +11,9 @@ import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.da
 import '../main.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key, required this.professorID});
+  const ChatScreen({super.key, required this.recipient});
 
-  final int professorID;
+  final User recipient;
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -81,7 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     // Join chat room
-    socketService.emit("joinChat", [widget.professorID]);
+    socketService.emit("joinChat", [widget.recipient.id]);
   }
 
   void _sendMessage() {
@@ -90,7 +91,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     // Send message via socket
     socketService.emit("sendMessage", [{
-      'professorID': widget.professorID,
+      'recipientID': widget.recipient.id,
       'message': text,
     }]);
     
@@ -121,6 +122,7 @@ class _ChatScreenState extends State<ChatScreen> {
               messageController: _messageController,
               onSendMessage: _sendMessage,
               scrollController: _scrollController,
+              recipient: widget.recipient,
             );
           } else {
             return MobileChatScreen(
@@ -128,6 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
               messageController: _messageController,
               onSendMessage: _sendMessage,
               scrollController: _scrollController,
+              recipient: widget.recipient,
             );
           }
         },
@@ -141,6 +144,7 @@ class DesktopChatScreen extends StatelessWidget {
   final TextEditingController messageController;
   final VoidCallback onSendMessage;
   final ScrollController scrollController;
+  final User recipient;
 
   const DesktopChatScreen({
     super.key,
@@ -148,6 +152,7 @@ class DesktopChatScreen extends StatelessWidget {
     required this.messageController,
     required this.onSendMessage,
     required this.scrollController,
+    required this.recipient,
   });
 
   @override
@@ -263,7 +268,7 @@ class DesktopChatScreen extends StatelessWidget {
                       Icon(Icons.account_circle, size: 60, color: Colors.grey),
                       SizedBox(width: 12),
                       Text(
-                        'Prof. Calvetti',
+                        'Prof. ${recipient.name}',
                         style: GoogleFonts.leagueSpartan(
                           fontSize: 26,
                           color: Colors.grey[800],
@@ -417,6 +422,7 @@ class MobileChatScreen extends StatelessWidget {
   final TextEditingController messageController;
   final VoidCallback onSendMessage;
   final ScrollController scrollController;
+  final User recipient;
 
   const MobileChatScreen({
     super.key,
@@ -424,6 +430,7 @@ class MobileChatScreen extends StatelessWidget {
     required this.messageController,
     required this.onSendMessage,
     required this.scrollController,
+    required this.recipient,
   });
 
   @override
