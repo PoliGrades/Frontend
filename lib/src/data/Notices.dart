@@ -1,3 +1,5 @@
+import 'package:polieats_frontend/main.dart';
+
 class Notice {
   final String title;
   final String content;
@@ -44,7 +46,16 @@ class Notices {
     ),
   ];
 
+  void fetchAllNotices() async {
+    try {
+      notices = await api.fetchNotices();
+    } catch (e) {
+      print('Error fetching notices: $e');
+    }
+  }
+
   List<Notice> getNoticesForCourse(String courseName) {
+    fetchAllNotices();
     return notices.where((notice) => notice.course == courseName).toList();
   }
 }

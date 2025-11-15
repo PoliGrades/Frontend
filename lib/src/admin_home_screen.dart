@@ -6,6 +6,7 @@ import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/create_assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Assignments.dart';
+import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/helpers/icon_map.dart';
 import 'package:polieats_frontend/src/widgets/home_screen_scaffold.dart';
@@ -19,12 +20,115 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   String selectedCourse = 'Matemática';
+
   final noticesController = Notices();
   final assignmentsController = Assignments();
+
+  // Add controllers for the notice form
+  final TextEditingController _noticeTitleController = TextEditingController();
+  final TextEditingController _noticeContentController = TextEditingController();
+
+  List<Assignment> assignments = [];
+  List<Notice> notices = [];
+  Course? course;
+  bool isLoading = true;
+
+  void onCourseChanged(String? newCourse) {
+    if (newCourse != null) {
+      setState(() {
+        selectedCourse = newCourse;
+        course = globals.courseController.getCourseByName(selectedCourse)!;
+        notices = noticesController.getNoticesForCourse(selectedCourse);
+        isLoading = true;
+      });
+      _loadAssignments();
+    }
+  }
+
+  Future<void> _loadAssignments() async {
+    if (course != null) {
+      try {
+        final fetchedAssignments = await assignmentsController.getAssignmentsForCourse(course!.id);
+        setState(() {
+          assignments = fetchedAssignments;
+          isLoading = false;
+        });
+      } catch (e) {
+        setState(() {
+          assignments = [];
+          isLoading = false;
+        });
+        print('Error loading assignments: $e');
+      }
+    }
+  }
+
+  Future<void> _createNotice() async {
+    final title = _noticeTitleController.text.trim();
+    final content = _noticeContentController.text.trim();
+
+    if (title.isEmpty || content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor, preencha todos os campos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final newNotice = await api.createNotice(title, content, course!.id);
+      
+      // Update the notices list
+      setState(() {
+        notices = noticesController.getNoticesForCourse(selectedCourse);
+      });
+
+      // Clear the form
+      _noticeTitleController.clear();
+      _noticeContentController.clear();
+
+      // Close the dialog
+      Navigator.of(context).pop();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Aviso criado com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Refresh notices from server
+      noticesController.fetchAllNotices();
+      setState(() {
+        notices = noticesController.getNoticesForCourse(selectedCourse);
+      });
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao criar aviso: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _noticeTitleController.dispose();
+    _noticeContentController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
+    course = globals.courseController.getCourseByName('Matemática')!;
+    noticesController.fetchAllNotices();
+    _loadAssignments();
   }
 
   @override
@@ -34,14 +138,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     final size = MediaQuery.of(context).size;
     final f = DateFormat('dd/MM/yyyy', 'pt_BR');
 
-    var courses = globals.courseController.getCourseByName(selectedCourse);
     var notices = noticesController.getNoticesForCourse(selectedCourse);
-    var assignments = assignmentsController.getAssignmentsForCourse(
-      courses!.name,
-    );
 
-    var color = courses.color;
-    var accentColor = courses.accentColor;
+    var color = course!.color;
+    var accentColor = course!.accentColor;
 
     return HomeScreenScaffold(
       body: SafeArea(
@@ -91,6 +191,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                   label: course.name,
                                 ),
                             ],
+                            onSelected: onCourseChanged,
                           ),
                         ],
                       ),
@@ -164,133 +265,164 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         ],
                       ),
                       Expanded(
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: assignments.length,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(width: 10);
-                          },
-                          itemBuilder: (context, index) {
-                            final assignment = assignments[index];
-                            final course = globals.courseController.getCourseByName(
-                              assignment.course,
-                            );
-
-                            // ignore: sized_box_for_whitespace
-                            return Material(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AssignmentScreen(
-                                        assignment: assignment,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: size.width * 0.60,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(10),
-                                    ),
-                                    color: Colors.grey.shade50,
-                                  ),
+                        child: isLoading 
+                          ? Center(
+                              child: CircularProgressIndicator(color: color),
+                            )
+                          : assignments.isEmpty
+                              ? Center(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                          color: course!.color,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 8,
-                                              left: 8,
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 4,
-                                                  horizontal: 8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white70,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                        Radius.circular(20),
-                                                      ),
-                                                ),
-                                                child: Text(
-                                                  f.format(assignment.dueDate),
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 12,
-                                                    color: course.color,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              bottom: -12,
-                                              right: 8,
-                                              child: Icon(
-                                                iconMap[course.name] ?? Icons.help,
-                                                size: 64,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
+                                      Icon(
+                                        Icons.assignment_outlined,
+                                        size: 48,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        "Nenhuma atividade pendente",
+                                        style: TextStyle(
+                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                          fontSize: 16,
+                                          color: Colors.grey.shade600,
                                         ),
                                       ),
-                                      SizedBox(height: 10),
-                                      Container(
-                                        padding: EdgeInsets.only(left: 10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              assignment.title,
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.leagueSpartan()
-                                                        .fontFamily,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              assignment.course,
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.leagueSpartan()
-                                                        .fontFamily,
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
+                                      Text(
+                                        "Crie uma nova atividade usando o botão +",
+                                        style: TextStyle(
+                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                          fontSize: 12,
+                                          color: Colors.grey.shade400,
                                         ),
                                       ),
                                     ],
                                   ),
+                                )
+                              : ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: BouncingScrollPhysics(),
+                                  itemCount: assignments.length,
+                                  separatorBuilder: (context, index) {
+                                    return SizedBox(width: 10);
+                                  },
+                                  itemBuilder: (context, index) {
+                                    final assignment = assignments[index];
+                                    
+                                    // ignore: sized_box_for_whitespace
+                                    return Material(
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AssignmentScreen(
+                                                assignment: assignment,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          width: size.width * 0.60,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                            color: Colors.grey.shade50,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  color: course!.color,
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(10),
+                                                    topRight: Radius.circular(10),
+                                                  ),
+                                                ),
+                                                child: Stack(
+                                                  children: [
+                                                    Positioned(
+                                                      top: 8,
+                                                      left: 8,
+                                                      child: Container(
+                                                        padding: EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                          horizontal: 8,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white70,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(20),
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          f.format(assignment.dueDate),
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                GoogleFonts.leagueSpartan()
+                                                                    .fontFamily,
+                                                            fontSize: 12,
+                                                            color: course!.color,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      bottom: -12,
+                                                      right: 8,
+                                                      child: Icon(
+                                                        iconMap[course!.name] ?? Icons.help,
+                                                        size: 64,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Container(
+                                                padding: EdgeInsets.only(left: 10),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      assignment.title,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            GoogleFonts.leagueSpartan()
+                                                                .fontFamily,
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      course!.name,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            GoogleFonts.leagueSpartan()
+                                                                .fontFamily,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -336,134 +468,164 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         ],
                       ),
                       Expanded(
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: assignments.length,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(width: 10);
-                          },
-                          itemBuilder: (context, index) {
-                            final assignment = assignments[index];
-                            final course = globals.courseController.getCourseByName(
-                              assignment.course,
-                            );
-
-                            // ignore: sized_box_for_whitespace
-                            return Material(
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AssignmentScreen(
-                                        assignment: assignment,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: size.width * 0.60,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(10),
-                                    ),
-                                    color: Colors.grey.shade50,
-                                  ),
+                        child: isLoading 
+                          ? Center(
+                              child: CircularProgressIndicator(color: color),
+                            )
+                          : assignments.isEmpty
+                              ? Center(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                          color: course!.color,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 8,
-                                              left: 8,
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 4,
-                                                  horizontal: 8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white70,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                        Radius.circular(20),
-                                                      ),
-                                                ),
-                                                child: Text(
-                                                  f.format(assignment.dueDate),
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 12,
-                                                    color: course.color,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              bottom: -12,
-                                              right: 8,
-                                              child: Icon(
-                                                iconMap[course.name] ??
-                                                    Icons.help,
-                                                size: 64,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
+                                      Icon(
+                                        Icons.grade_outlined,
+                                        size: 48,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        "Nenhuma atividade avaliada",
+                                        style: TextStyle(
+                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                          fontSize: 16,
+                                          color: Colors.grey.shade600,
                                         ),
                                       ),
-                                      SizedBox(height: 10),
-                                      Container(
-                                        padding: EdgeInsets.only(left: 10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              assignment.title,
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.leagueSpartan()
-                                                        .fontFamily,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              assignment.course,
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.leagueSpartan()
-                                                        .fontFamily,
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
+                                      Text(
+                                        "As atividades aparecerão aqui após serem corrigidas",
+                                        style: TextStyle(
+                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                          fontSize: 12,
+                                          color: Colors.grey.shade400,
                                         ),
                                       ),
                                     ],
                                   ),
+                                )
+                              : ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: BouncingScrollPhysics(),
+                                  itemCount: assignments.length,
+                                  separatorBuilder: (context, index) {
+                                    return SizedBox(width: 10);
+                                  },
+                                  itemBuilder: (context, index) {
+                                    final assignment = assignments[index];
+
+                                    // ignore: sized_box_for_whitespace
+                                    return Material(
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AssignmentScreen(
+                                                assignment: assignment,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          width: size.width * 0.60,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                            color: Colors.grey.shade50,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  color: course!.color,
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(10),
+                                                    topRight: Radius.circular(10),
+                                                  ),
+                                                ),
+                                                child: Stack(
+                                                  children: [
+                                                    Positioned(
+                                                      top: 8,
+                                                      left: 8,
+                                                      child: Container(
+                                                        padding: EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                          horizontal: 8,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white70,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(20),
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          f.format(assignment.dueDate),
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                GoogleFonts.leagueSpartan()
+                                                                    .fontFamily,
+                                                            fontSize: 12,
+                                                            color: course!.color,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      bottom: -12,
+                                                      right: 8,
+                                                      child: Icon(
+                                                        iconMap[course!.name] ?? Icons.help,
+                                                        size: 64,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Container(
+                                                padding: EdgeInsets.only(left: 10),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      assignment.title,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            GoogleFonts.leagueSpartan()
+                                                                .fontFamily,
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      course!.name,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            GoogleFonts.leagueSpartan()
+                                                                .fontFamily,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -524,6 +686,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           TextField(
+                                            controller: _noticeTitleController,
                                             style: TextStyle(
                                               fontFamily:
                                                   GoogleFonts.leagueSpartan()
@@ -542,6 +705,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                           ),
                                           SizedBox(height: 24),
                                           TextField(
+                                            controller: _noticeContentController,
                                             style: TextStyle(
                                               fontFamily:
                                                   GoogleFonts.leagueSpartan()
@@ -549,6 +713,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                             ),
                                             maxLines: 6,
                                             decoration: InputDecoration(
+                                              labelText: "Conteúdo",
                                               contentPadding:
                                                   EdgeInsets.symmetric(
                                                     horizontal: 12,
@@ -560,7 +725,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                           ),
                                           SizedBox(height: 12),
                                           Text(
-                                            "Atenção: O aviso será publicado imediatamente após a criação.",
+                                            "Atenção: O aviso será publicado imediatamente após a criação para a matéria: ${course!.name}",
                                             style: TextStyle(
                                               fontFamily:
                                                   GoogleFonts.leagueSpartan()
@@ -575,6 +740,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                     actions: [
                                       TextButton(
                                         onPressed: () {
+                                          // Clear the form and close dialog
+                                          _noticeTitleController.clear();
+                                          _noticeContentController.clear();
                                           Navigator.of(context).pop();
                                         },
                                         child: Text(
@@ -588,10 +756,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          // Lógica para criar o aviso
-                                          Navigator.of(context).pop();
-                                        },
+                                        onPressed: _createNotice,
                                         child: Text(
                                           "Criar",
                                           style: TextStyle(
@@ -618,208 +783,239 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         ],
                       ),
                       Expanded(
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: notices.length,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(width: 10);
-                          },
-                          itemBuilder: (context, index) {
-                            final notice = notices[index];
-                            final course = globals.courseController.getCourseByName(
-                              notice.course,
-                            );
-
-                            // ignore: sized_box_for_whitespace
-                            return GestureDetector(
-                              child: Container(
-                                width: size.width * 0.60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                  color: Colors.grey.shade50,
-                                ),
+                        child: notices.isEmpty
+                            ? Center(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(12.0),
+                                    Icon(
+                                      Icons.campaign_outlined,
+                                      size: 48,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Nenhum aviso publicado",
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                        fontSize: 16,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Publique um novo aviso usando o botão +",
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                        fontSize: 12,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: notices.length,
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(width: 10);
+                                },
+                                itemBuilder: (context, index) {
+                                  final notice = notices[index];
+
+                                  // ignore: sized_box_for_whitespace
+                                  return GestureDetector(
+                                    child: Container(
+                                      width: size.width * 0.60,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        color: Colors.grey.shade50,
+                                      ),
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Container(
-                                                width: 30,
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                        Radius.circular(1000),
+                                          Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                              Radius.circular(1000),
+                                                            ),
+                                                        color: course!.accentColor,
                                                       ),
-                                                  color: course!.accentColor,
+                                                      child: Icon(
+                                                        iconMap[course!.name] ?? Icons.help,
+                                                        size: 20,
+                                                        color: course!.color,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      f.format(notice.date),
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            GoogleFonts.leagueSpartan()
+                                                                .fontFamily,
+                                                        fontSize: 12,
+                                                        color: Colors.grey.shade700,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                child: Icon(
-                                                  iconMap[course.name] ?? Icons.help,
-                                                  size: 20,
-                                                  color: course.color,
+                                                SizedBox(height: 12),
+                                                Text(
+                                                  notice.title,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                              ),
-                                              Text(
-                                                f.format(notice.date),
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      GoogleFonts.leagueSpartan()
-                                                          .fontFamily,
-                                                  fontSize: 12,
-                                                  color: Colors.grey.shade700,
-                                                  fontWeight: FontWeight.bold,
+                                                SizedBox(height: 4),
+                                                Text(
+                                                  notice.content.length > 100 
+                                                    ? '${notice.content.substring(0, 100)}...'
+                                                    : notice.content,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 14,
+                                                  ),
+                                                  maxLines: 3,
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 12),
-                                          Text(
-                                            notice.title,
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.leagueSpartan()
-                                                      .fontFamily,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            notice.content,
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.leagueSpartan()
-                                                      .fontFamily,
-                                              fontSize: 14,
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              onTap: () {
-                                showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(16),
-                                        ),
-                                      ),
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                          0.95,
-                                      padding: EdgeInsets.all(16),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 40,
-                                                    height: 40,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                            Radius.circular(
-                                                              1000,
-                                                            ),
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(16),
+                                              ),
+                                            ),
+                                            height:
+                                                MediaQuery.of(context).size.height *
+                                                0.95,
+                                            padding: EdgeInsets.all(16),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          width: 40,
+                                                          height: 40,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                  Radius.circular(
+                                                                    1000,
+                                                                  ),
+                                                                ),
+                                                            color: course!.accentColor,
                                                           ),
-                                                      color: course.accentColor,
+                                                          child: Icon(
+                                                            iconMap[course!.name] ?? Icons.help,
+                                                            size: 30,
+                                                            color: course!.color,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 16),
+                                                        Text(
+                                                          course!.name,
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                GoogleFonts.leagueSpartan()
+                                                                    .fontFamily,
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    child: Icon(
-                                                      iconMap[course.name] ?? Icons.help,
-                                                      size: 30,
-                                                      color: course.color,
+                                                    IconButton(
+                                                      icon: Icon(Icons.close),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop();
+                                                      },
                                                     ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 20),
+                                                Text(
+                                                  notice.title,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                  SizedBox(width: 16),
-                                                  Text(
-                                                    course.name,
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          GoogleFonts.leagueSpartan()
-                                                              .fontFamily,
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                                ),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  'Publicado em: ${f.format(notice.date)},\npor ${notice.owner}',
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 14,
+                                                    color: Colors.grey.shade700,
                                                   ),
-                                                ],
-                                              ),
-                                              IconButton(
-                                                icon: Icon(Icons.close),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 20),
-                                          Text(
-                                            notice.title,
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.leagueSpartan()
-                                                      .fontFamily,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
+                                                ),
+                                                SizedBox(height: 20),
+                                                Text(
+                                                  notice.content,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          Text(
-                                            'Publicado em: ${f.format(notice.date)},\npor ${notice.owner}',
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.leagueSpartan()
-                                                      .fontFamily,
-                                              fontSize: 14,
-                                              color: Colors.grey.shade700,
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          Text(
-                                            notice.content,
-                                            style: TextStyle(
-                                              fontFamily:
-                                                  GoogleFonts.leagueSpartan()
-                                                      .fontFamily,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),

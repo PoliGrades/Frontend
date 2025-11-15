@@ -17,18 +17,54 @@ class CourseScreen extends StatefulWidget {
 }
 
 class _CourseScreenState extends State<CourseScreen> {
+  final assignmentsController = Assignments();
+  final gradesController = Grades();
+  
+  List<Assignment> assignments = [];
+  List<Grade> grades = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final fetchedAssignments = await assignmentsController.getAssignmentsForCourse(widget.course.id);
+      final fetchedGrades = gradesController.getGradesForCourse(widget.course.name);
+      
+      setState(() {
+        assignments = fetchedAssignments;
+        grades = fetchedGrades;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        assignments = [];
+        grades = [];
+        isLoading = false;
+      });
+      print('Error loading course data: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final f = DateFormat('dd/MM/yyyy');
 
-    final assignmentsController = Assignments();
-    final assignments = assignmentsController.getAssignmentsForCourse(
-      widget.course.name,
-    );
-
-    final gradesController = Grades();
-    final grades = gradesController.getGradesForCourse(widget.course.name);
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(
+            color: widget.course.color,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -118,113 +154,123 @@ class _CourseScreenState extends State<CourseScreen> {
                         ),
                       ),
                       Expanded(
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: assignments.length,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(width: 10);
-                          },
-                          itemBuilder: (context, index) {
-                            final assignment = assignments[index];
-
-                            // ignore: sized_box_for_whitespace
-                            return Container(
-                              width: size.width * 0.60,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
+                        child: assignments.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "Nenhuma atividade encontrada",
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                                color: Colors.grey.shade50,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 100,
+                              )
+                            : ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: assignments.length,
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(width: 10);
+                                },
+                                itemBuilder: (context, index) {
+                                  final assignment = assignments[index];
+
+                                  return Container(
+                                    width: size.width * 0.60,
                                     decoration: BoxDecoration(
-                                      color: widget.course.color,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10),
                                       ),
+                                      color: Colors.grey.shade50,
                                     ),
-                                    child: Stack(
-                                      children: [
-                                        Positioned(
-                                          top: 8,
-                                          left: 8,
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 4,
-                                              horizontal: 8,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white70,
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(20),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              f.format(assignment.dueDate),
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    GoogleFonts.leagueSpartan()
-                                                        .fontFamily,
-                                                fontSize: 12,
-                                                color: widget.course.color,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          bottom: -12,
-                                          right: 8,
-                                          child: Icon(
-                                            iconMap[widget.course.name] ?? Icons.help,
-                                            size: 64,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Container(
-                                    padding: EdgeInsets.only(left: 10),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          assignment.title,
-                                          style: TextStyle(
-                                            fontFamily:
-                                                GoogleFonts.leagueSpartan()
-                                                    .fontFamily,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                        Container(
+                                          height: 100,
+                                          decoration: BoxDecoration(
+                                            color: widget.course.color,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                            ),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Positioned(
+                                                top: 8,
+                                                left: 8,
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 4,
+                                                    horizontal: 8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white70,
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(20),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    f.format(assignment.dueDate),
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          GoogleFonts.leagueSpartan()
+                                                              .fontFamily,
+                                                      fontSize: 12,
+                                                      color: widget.course.color,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: -12,
+                                                right: 8,
+                                                child: Icon(
+                                                  iconMap[widget.course.name] ?? Icons.help,
+                                                  size: 64,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Text(
-                                          assignment.course,
-                                          style: TextStyle(
-                                            fontFamily:
-                                                GoogleFonts.leagueSpartan()
-                                                    .fontFamily,
-                                            fontSize: 12,
-                                            color: Colors.grey,
+                                        SizedBox(height: 10),
+                                        Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                assignment.title,
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.leagueSpartan()
+                                                          .fontFamily,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                assignment.course,
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.leagueSpartan()
+                                                          .fontFamily,
+                                                  fontSize: 12,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
                       ),
                     ],
                   ),
@@ -247,102 +293,111 @@ class _CourseScreenState extends State<CourseScreen> {
                         ),
                       ),
                       Expanded(
-                        child: ListView.separated(
-                          scrollDirection: Axis.vertical,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: grades.length,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(height: 10);
-                          },
-                          itemBuilder: (context, index) {
-                            final grade = grades[index];
-
-                            // ignore: sized_box_for_whitespace
-                            return Container(
-                              height: 120,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
+                        child: grades.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "Nenhuma nota encontrada",
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                                color: Colors.grey.shade50,
-                              ),
-                              padding: EdgeInsets.all(10),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        f.format(grade.dateRecorded),
-                                        style: TextStyle(
-                                          fontFamily:
-                                              GoogleFonts.leagueSpartan()
-                                                  .fontFamily,
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
+                              )
+                            : ListView.separated(
+                                scrollDirection: Axis.vertical,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: grades.length,
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(height: 10);
+                                },
+                                itemBuilder: (context, index) {
+                                  final grade = grades[index];
+
+                                  return Container(
+                                    height: 120,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(10),
                                       ),
-                                      // A container badge that shows if the grade is higher than 60% of maxScore
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10),
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 2,
-                                          horizontal: 6,
+                                      color: Colors.grey.shade50,
+                                    ),
+                                    padding: EdgeInsets.all(10),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              f.format(grade.dateRecorded),
+                                              style: TextStyle(
+                                                fontFamily:
+                                                    GoogleFonts.leagueSpartan()
+                                                        .fontFamily,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 10),
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 2,
+                                                horizontal: 6,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    grade.score >=
+                                                        0.6 * grade.maxScore
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                grade.score >= 0.6 * grade.maxScore
+                                                    ? "Aprovado"
+                                                    : "Reprovado",
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      GoogleFonts.leagueSpartan()
+                                                          .fontFamily,
+                                                  fontSize: 12,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        decoration: BoxDecoration(
-                                          color:
-                                              grade.score >=
-                                                  0.6 * grade.maxScore
-                                              ? Colors.green
-                                              : Colors.red,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          grade.score >= 0.6 * grade.maxScore
-                                              ? "Aprovado"
-                                              : "Reprovado",
+                                        SizedBox(height: 5),
+                                        Text(
+                                          grade.assignmentName,
                                           style: TextStyle(
-                                            fontFamily:
-                                                GoogleFonts.leagueSpartan()
-                                                    .fontFamily,
-                                            fontSize: 12,
-                                            color: Colors.white,
+                                            fontFamily: GoogleFonts.leagueSpartan()
+                                                .fontFamily,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    grade.assignmentName,
-                                    style: TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                        SizedBox(height: 6),
+                                        Text(
+                                          "Nota: ${grade.score.toStringAsFixed(1)}/${grade.maxScore.toStringAsFixed(1)}",
+                                          style: TextStyle(
+                                            fontFamily: GoogleFonts.leagueSpartan()
+                                                .fontFamily,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  SizedBox(height: 6),
-                                  Text(
-                                    "Nota: ${grade.score.toStringAsFixed(1)}/${grade.maxScore.toStringAsFixed(1)}",
-                                    style: TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        ),
                       ),
                     ],
                   ),
@@ -364,40 +419,56 @@ class _CourseScreenState extends State<CourseScreen> {
                           fontSize: 18,
                         ),
                       ),
-                      // Using fl_chart to create a line chart showing the grades over time and the average line
                       Expanded(
-                        child: LineChart(
-                          LineChartData(
-                            gridData: FlGridData(show: true),
-                            titlesData: FlTitlesData(
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: true),
+                        child: grades.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "Sem dados suficientes para mostrar o gráfico",
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              )
+                            : LineChart(
+                                LineChartData(
+                                  gridData: FlGridData(show: true),
+                                  titlesData: FlTitlesData(
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(showTitles: true),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(showTitles: true),
+                                    ),
+                                    topTitles: AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    rightTitles: AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(show: true),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: grades
+                                          .asMap()
+                                          .entries
+                                          .map(
+                                            (e) => FlSpot(
+                                              e.key.toDouble(),
+                                              e.value.score,
+                                            ),
+                                          )
+                                          .toList(),
+                                      isCurved: true,
+                                      barWidth: 3,
+                                      color: widget.course.color,
+                                      dotData: FlDotData(show: true),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: true),
-                              ),
-                            ),
-                            borderData: FlBorderData(show: true),
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: grades
-                                    .asMap()
-                                    .entries
-                                    .map(
-                                      (e) => FlSpot(
-                                        e.key.toDouble(),
-                                        e.value.score,
-                                      ),
-                                    )
-                                    .toList(),
-                                isCurved: true,
-                                barWidth: 3,
-                                color: widget.course.color,
-                                dotData: FlDotData(show: true),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                     ],
                   ),

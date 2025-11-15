@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Course {
+  final int id;
   final String name;
   final String description;
   final Color color;
   final Color accentColor;
 
   Course({
+    required this.id,
     required this.name,
     required this.description,
     required this.color,
@@ -16,47 +18,57 @@ class Course {
 
 class CourseController {
   List<Course> courses = [
-    // Course(
-    //   name: 'Matemática',
-    //   description: 'Aprenda os fundamentos da matemática.',
-    //   color: Colors.blue,
-    //   accentColor: Colors.blue.shade50,
-    // ),
-    // Course(
-    //   name: 'Física',
-    //   description: 'Explore os conceitos básicos da física.',
-    //   color: Colors.red,
-    //   accentColor: Colors.red.shade50,
-    // ),
-    // Course(
-    //   name: 'Química',
-    //   description: 'Descubra os segredos da química.',
-    //   color: Colors.green,
-    //   accentColor: Colors.green.shade50,
-    // ),
-    // Course(
-    //   name: 'Biologia',
-    //   description: 'Entenda os processos da vida.',
-    //   color: Colors.orange,
-    //   accentColor: Colors.orange.shade50,
-    // ),
-    // Course(
-    //   name: 'História',
-    //   description: 'Reviva os eventos históricos mais importantes.',
-    //   color: Colors.purple,
-    //   accentColor: Colors.purple.shade50,
-    // ),
-    // Course(
-    //   name: 'Geografia',
-    //   description: 'Explore o mundo ao seu redor.',
-    //   color: Colors.teal,
-    //   accentColor: Colors.teal.shade50,
-    // ),
+    Course(
+      id: 1,
+      name: 'Matemática',
+      description: 'Aprenda os fundamentos da matemática.',
+      color: const Color(0xFF2196F3),
+      accentColor: const Color(0xFFE3F2FD),
+    ),
+    Course(
+      id: 2,
+      name: 'Física',
+      description: 'Explore os conceitos básicos da física.',
+      color: Colors.red,
+      accentColor: Colors.red.shade50,
+    ),
+    Course(
+      id: 3,
+      name: 'Química',
+      description: 'Descubra os segredos da química.',
+      color: Colors.green,
+      accentColor: Colors.green.shade50,
+    ),
+    Course(
+      id: 4,
+      name: 'Biologia',
+      description: 'Entenda os processos da vida.',
+      color: Colors.orange,
+      accentColor: Colors.orange.shade50,
+    ),
+    Course(
+      id: 5,
+      name: 'História',
+      description: 'Reviva os eventos históricos mais importantes.',
+      color: Colors.purple,
+      accentColor: Colors.purple.shade50,
+    ),
+    Course(
+      id: 6,
+      name: 'Geografia',
+      description: 'Explore o mundo ao seu redor.',
+      color: Colors.teal,
+      accentColor: Colors.teal.shade50,
+    ),
   ];
 
   CourseController();
 
   List<Course> get allCourses => courses;
+
+  Course? getCourseById(int id) {
+    return courses.firstWhere((course) => course.id == id);
+  }
 
   Course? getCourseByName(String name) {
     return courses.firstWhere((course) => course.name == name);
@@ -98,6 +110,7 @@ class CourseController {
       final accentColor = Color(int.parse(rawAccent, radix: 16));
 
       return Course(
+        id: int.parse(course['id']?.toString() ?? '0'),
         name: name,
         description: description,
         color: color,

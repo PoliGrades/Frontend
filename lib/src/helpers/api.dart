@@ -87,7 +87,7 @@ class Api {
 
   Future<List<Notice>> fetchNotices() async {
     final response = await dio.get(
-      '/notices',
+      '/warnings',
       options: Options(
         validateStatus: (status) => status == 200 || status == 500 || status == 401,
       )
@@ -100,13 +100,41 @@ class Api {
     List<dynamic> data = response.data;
     List<Notice> notices = data.map((notice) => Notice(
       title: notice['title'].toString(),
-      content: notice['content'].toString(),
-      date: DateTime.parse(notice['date'].toString()),
-      course: notice['className'].toString(),
+      content: notice['description'].toString(),
+      date: DateTime.parse(notice['timestamp'].toString()),
+      course: notice['subjectName'].toString(),
       owner: notice['userName'].toString()
     )).toList();
 
     return notices;
+  }
+
+  Future<Notice> createNotice(String title, String content, int subjectId) async {
+    final response = await dio.post(
+      '/warning',
+      data: {
+        'title': title,
+        'description': content,
+        'subjectId': subjectId,
+      },
+      options: Options(
+        validateStatus: (status) => status == 201 || status == 400 || status == 401,
+      )
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create notice: ${response.statusCode}');
+    }
+
+    Map<String, dynamic> data = response.data;
+
+    return Notice(
+      title: data['title'].toString(),
+      content: data['description'].toString(),
+      date: DateTime.parse(data['timestamp'].toString()),
+      course: data['subjectName'].toString(),
+      owner: data['userName'].toString()
+    );
   }
 
   Future<List<Course>> fetchCourses() async {
@@ -142,6 +170,7 @@ class Api {
 
       // parse icon string: supports "0x..." hex, plain hex, or decimal codepoint.
       return Course(
+        id: int.parse(course['id']?.toString() ?? '0'),
         name: name,
         description: description,
         color: color,
@@ -175,5 +204,50 @@ class Api {
     if (response.statusCode != 201 && response.statusCode != 200) {
       throw Exception('Failed to create assignment: ${response.statusCode}');
     }
+  }
+
+  Future<List<Assignment>> fetchAssignmentsForSubject(int subjectId) async {
+    final response = await dio.get(
+      '/tasks/$subjectId',
+      options: Options(
+        validateStatus: (status) => status == 200 || status == 500 || status == 401,
+      )
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch assignments: ${response.statusCode}');
+    }
+
+    List<dynamic> data = response.data;
+    List<Assignment> assignments = data.map((assignment) {
+      // Handle attachments - check if they exist in the response
+      List<Attachment> attachments = [];
+      if (assignment['attachments'] != null) {
+        attachments = (assignment['attachments'] as List<dynamic>).map((att) => Attachment(
+          fileName: att['fileName'].toString(),
+          filePath: att['filePath'].toString(),
+          fileBytes: List<int>.empty(), // Placeholder, actual bytes would need to be fetched separately
+        )).toList();
+      }
+
+      // Get course name from the course controller using classId
+      String courseName = '';
+      try {
+        final course = globals.courseController.getCourseById(assignment['classId']);
+        courseName = course?.name ?? 'Unknown Course';
+      } catch (e) {
+        courseName = 'Unknown Course';
+      }
+
+      return Assignment(
+        title: assignment['title'].toString(),
+        description: assignment['description'].toString(),
+        dueDate: DateTime.parse(assignment['dueDate'].toString()),
+        course: courseName,
+        attachments: attachments,
+      );
+    }).toList();
+
+    return assignments;
   }
 }
