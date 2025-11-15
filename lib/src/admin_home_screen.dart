@@ -250,7 +250,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      CreateAssignmentScreen(),
+                                      CreateAssignmentScreen(
+                                        courseId: course!.id,
+                                      ),
                                 ),
                               );
                             },
@@ -317,7 +319,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) => AssignmentScreen(
-                                                assignment: assignment,
+                                                assignmentId: assignment.id!,
                                               ),
                                             ),
                                           );
@@ -520,7 +522,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) => AssignmentScreen(
-                                                assignment: assignment,
+                                                assignmentId: assignment.id!,
                                               ),
                                             ),
                                           );

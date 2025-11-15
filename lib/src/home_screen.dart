@@ -310,7 +310,7 @@ class MobileHomeScreen extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => AssignmentScreen(
-                                        assignment: assignment,
+                                        assignmentId: assignment.id!,
                                       ),
                                     ),
                                   );

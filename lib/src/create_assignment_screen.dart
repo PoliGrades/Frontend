@@ -7,7 +7,8 @@ import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 
 class CreateAssignmentScreen extends StatefulWidget {
-  const CreateAssignmentScreen({super.key});
+  const CreateAssignmentScreen({super.key, required this.courseId});
+  final int courseId;
 
   static List<Attachment> ? attachedFiles = [];
   static DateTime ? dueDate;
@@ -234,7 +235,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                         CreateAssignmentScreen.titleController.text,
                         CreateAssignmentScreen.descriptionController.text,
                         CreateAssignmentScreen.dueDate ?? DateTime.now(),
-                        686361,
+                          widget.courseId,
                         CreateAssignmentScreen.attachedFiles!,
                       );
                     },

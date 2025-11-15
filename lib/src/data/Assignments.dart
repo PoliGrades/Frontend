@@ -9,6 +9,7 @@ class Attachment {
 }
 
 class Assignment {
+  final int? id; // Add this field
   final String title;
   final String description;
   final DateTime dueDate;
@@ -17,6 +18,7 @@ class Assignment {
   final List<Attachment>? attachments;
 
   Assignment({
+    this.id, // Add this parameter
     required this.title,
     required this.description,
     required this.dueDate,

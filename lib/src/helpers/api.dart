@@ -10,7 +10,7 @@ import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 
 class Api {
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl = 'https://api.poligrades.matelz.dev';
   late Dio dio;
   late BrowserHttpClientAdapter httpClientAdapter;
 
@@ -240,6 +240,7 @@ class Api {
       }
 
       return Assignment(
+        id: assignment['id'],
         title: assignment['title'].toString(),
         description: assignment['description'].toString(),
         dueDate: DateTime.parse(assignment['dueDate'].toString()),
@@ -249,5 +250,47 @@ class Api {
     }).toList();
 
     return assignments;
+  }
+
+  Future<Assignment> fetchAssignmentById(int assignmentId) async {
+    final response = await dio.get(
+      '/task/$assignmentId',
+      options: Options(
+        validateStatus: (status) => status == 200 || status == 404 || status == 401,
+      )
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch assignment: ${response.statusCode}');
+    }
+
+    Map<String, dynamic> data = response.data;
+    
+    // Handle attachments - check if they exist in the response
+    List<Attachment> attachments = [];
+    if (data['attachments'] != null) {
+      attachments = (data['attachments'] as List<dynamic>).map((att) => Attachment(
+        fileName: att['fileName'].toString(),
+        filePath: att['filePath'].toString(),
+        fileBytes: List<int>.empty(), // Placeholder, actual bytes would need to be fetched separately
+      )).toList();
+    }
+
+    // Get course name from the course controller using classId
+    String courseName = '';
+    try {
+      final course = globals.courseController.getCourseById(data['classId']);
+      courseName = course?.name ?? 'Unknown Course';
+    } catch (e) {
+      courseName = 'Unknown Course';
+    }
+
+    return Assignment(
+      title: data['title'].toString(),
+      description: data['description'].toString(),
+      dueDate: DateTime.parse(data['dueDate'].toString()),
+      course: courseName,
+      attachments: attachments,
+    );
   }
 }
