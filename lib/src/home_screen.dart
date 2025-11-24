@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
+import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
@@ -266,7 +267,12 @@ class MobileHomeScreen extends StatelessWidget {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push( context, MaterialPageRoute(
+                                builder: (context) => CourseOverviewScreen(),
+                              ),
+                            );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue.shade100,
                               shape: RoundedRectangleBorder(
@@ -277,7 +283,7 @@ class MobileHomeScreen extends StatelessWidget {
                               "Ver todas",
                               style: TextStyle(
                                 fontFamily:
-                                    GoogleFonts.leagueSpartan().fontFamily,
+                                  GoogleFonts.leagueSpartan().fontFamily,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue,
@@ -393,7 +399,7 @@ class MobileHomeScreen extends StatelessWidget {
                   height: 250,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 15,
+                    spacing: 20,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -901,8 +907,14 @@ class MobileHomeScreen extends StatelessWidget {
             case 0:
               break;
             case 1:
+              Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => CourseOverviewScreen()));
               break;
             case 2:
+              // Navigator.of(
+              //   context,
+              // ).push(MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()));
               break;
             case 3:
               Navigator.of(
@@ -1230,22 +1242,12 @@ class DesktopHomeScreen extends StatelessWidget {
                                       assignments,
                                     ),
                                     viewHeaderHeight: 50,
-                                    todayHighlightColor: Color.fromARGB(
-                                      255,
-                                      45,
-                                      176,
-                                      194,
-                                    ),
+                                    todayHighlightColor: Color.fromARGB(255, 45, 176, 194),
                                     showDatePickerButton: true,
                                     selectionDecoration: BoxDecoration(
                                       color: Colors.transparent,
                                       border: Border.all(
-                                        color: Color.fromARGB(
-                                          255,
-                                          45,
-                                          176,
-                                          194,
-                                        ),
+                                        color: Color.fromARGB(255, 45, 176, 194),
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.all(
