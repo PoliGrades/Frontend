@@ -15,6 +15,7 @@ import 'package:polieats_frontend/src/widgets/components/no_courses_state.dart';
 import 'package:polieats_frontend/src/widgets/components/user_header.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:polieats_frontend/src/notices_overview_screen.dart';
 
 import '../main.dart';
 
@@ -626,7 +627,14 @@ class MobileHomeScreen extends StatelessWidget {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NoticesOverviewScreen(),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue.shade100,
                               shape: RoundedRectangleBorder(

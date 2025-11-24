@@ -45,6 +45,10 @@ class Notices {
     //   course: 'Física',
     // ),
   ];
+  
+  Notices();
+  
+  List<Notice> get allNotices => notices;
 
   Notices() {
     fetchAllNotices();
