@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/main.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/management_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 
 enum NavigationItem {
   home,
@@ -224,7 +226,10 @@ class ResponsiveScaffold extends StatelessWidget {
       case 0: // Home
         if (currentIndex != NavigationItem.home) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => 
+                          globals.currentUser.role == UserRole.STUDENT
+                            ? HomeScreen()
+                            : AdminHomeScreen()),
           );
         }
         break;
@@ -249,7 +254,7 @@ class ResponsiveScaffold extends StatelessWidget {
         if (currentIndex != NavigationItem.chat) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => ChatScreen(professorID: 1234),
+              builder: (context) => SelectProfessorScreen(),
             ),
           );
         }

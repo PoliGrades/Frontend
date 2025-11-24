@@ -4,13 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/admin_home_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/data/Class.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/management_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
@@ -170,7 +170,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChatScreen(professorID: 1234),
+                          builder: (context) => SelectProfessorScreen(),
                         ),
                       );
                     },

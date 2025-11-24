@@ -3,11 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/data/Class.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Submissions.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
+import 'package:polieats_frontend/src/data/User.dart';
+import 'package:polieats_frontend/src/home_screen.dart';
+import 'package:polieats_frontend/src/management_screen.dart';
+import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
+import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 class AssignmentScreen extends StatefulWidget {
   const AssignmentScreen({super.key, required this.assignmentId});
@@ -199,6 +207,138 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Consider desktop mode for screens wider than 1000px
+        if (constraints.maxWidth > 1000) {
+          return _buildDesktopLayout(context);
+        } else {
+          return _buildMobileLayout(context);
+        }
+      },
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset('assets/images/logo.png', width: 40, height: 40),
+              UserIconDropdown(radius: 20),
+            ],
+          ),
+        ),
+        body: Row(
+          children: <Widget>[
+            _buildSidebar(context, size),
+            _buildDivider(size.height, size),
+            Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (errorMessage != null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset('assets/images/logo.png', width: 40, height: 40),
+              UserIconDropdown(radius: 20),
+            ],
+          ),
+        ),
+        body: Row(
+          children: <Widget>[
+            _buildSidebar(context, size),
+            _buildDivider(size.height, size),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Erro ao carregar atividade',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      errorMessage!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          errorMessage = null;
+                        });
+                        _loadAssignment();
+                      },
+                      child: Text('Tentar novamente'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset('assets/images/logo.png', width: 40, height: 40),
+            UserIconDropdown(radius: 20),
+          ],
+        ),
+      ),
+      body: Row(
+        children: <Widget>[
+          _buildSidebar(context, size),
+          _buildDivider(size.height, size),
+          Expanded(
+            child: _buildAssignmentContent(context, isDesktop: true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
     if (isLoading) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -258,24 +398,161 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
       );
     }
 
-    final f = DateFormat('dd/MM/yyyy', 'pt_BR');
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(backgroundColor: Colors.white),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
+      body: _buildAssignmentContent(context, isDesktop: false),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        iconSize: 24,
+        selectedItemColor: Colors.blue,
+        selectedLabelStyle: TextStyle(
+          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+          fontSize: 12,
+        ),
+        currentIndex: 2,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Atividades',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebar(BuildContext context, Size size) {
+    return SizedBox(
+      width: size.width * 0.20,
+      child: Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          spacing: 20,
+          children: [
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Início'),
+              selected: false,
+              selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+              selectedColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+              ),
+              onTap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) => globals.currentUser.role == UserRole.STUDENT ? HomeScreen() : AdminHomeScreen(),
+                ));
+              },
+            ),
+            if (globals.currentUser.role != UserRole.STUDENT) ...[
+              ListTile(
+                leading: Icon(Icons.manage_accounts),
+                title: Text('Gerenciar'),
+                selected: false,
+                selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+                selectedColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManagementScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+            ListTile(
+                        leading: Icon(Icons.book),
+                        title: Text('Matérias'),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => CourseOverviewScreen()),
+                          );
+                        },
+                      ),
+            ListTile(
+              leading: Icon(Icons.assignment),
+              title: Text('Atividades'),
+              selected: true,
+              selectedTileColor: Color.fromARGB(255, 45, 176, 194),
+              selectedColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Perfil'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.chat),
+              title: Text('Chat'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SelectProfessorScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDivider(double dividerHeight, Size size) {
+    return SizedBox(
+      width: 20,
+      child: Center(
+        child: Container(
+          width: 1,
+          height: dividerHeight > 0 ? dividerHeight : size.height,
+          color: Colors.grey.shade300,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAssignmentContent(BuildContext context, {required bool isDesktop}) {
+    final f = DateFormat('dd/MM/yyyy', 'pt_BR');
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(isDesktop ? 32.0 : 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
@@ -300,126 +577,133 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          Text(
-                            assignment!.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                          SizedBox(
+                            width: isDesktop ? MediaQuery.of(context).size.width * 0.5 : null,
+                            child: Text(
+                              assignment!.title,
+                              style: TextStyle(
+                                fontSize: isDesktop ? 24 : 20,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      Text(
-                        mySubmission?.isGraded == true
-                            ? '${mySubmission!.grade?.toStringAsFixed(1) ?? 0}/10'
+                    ),
+                    Text(
+                      mySubmission?.isGraded == true
+                          ? '${mySubmission!.grade?.toStringAsFixed(1) ?? 0}/10'
+                          : mySubmission != null 
+                              ? 'Aguardando nota'
+                              : 'Não entregue',
+                      style: TextStyle(
+                        fontSize: isDesktop ? 28 : 24,
+                        fontWeight: FontWeight.bold,
+                        color: mySubmission?.isGraded == true 
+                            ? _getGradeColor(mySubmission!.grade ?? 0, 10)
                             : mySubmission != null 
-                                ? 'Aguardando nota'
-                                : 'Não entregue',
+                                ? Colors.orange.shade600
+                                : Colors.red.shade600,
+                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Submission Status Section
+              if (mySubmission != null) ...[
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: mySubmission!.isGraded ? Colors.green.shade50 : Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: mySubmission!.isGraded ? Colors.green.shade200 : Colors.blue.shade200,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            mySubmission!.isGraded ? Icons.check_circle : Icons.upload_file,
+                            color: mySubmission!.isGraded ? Colors.green : Colors.blue,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            mySubmission!.isGraded ? 'Atividade Avaliada' : 'Atividade Entregue',
+                            style: TextStyle(
+                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isDesktop ? 16 : 14,
+                              color: mySubmission!.isGraded ? Colors.green.shade700 : Colors.blue.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Entregue em: ${DateFormat('dd/MM/yyyy HH:mm').format(mySubmission!.submittedAt)}',
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: mySubmission?.isGraded == true 
-                              ? _getGradeColor(mySubmission!.grade ?? 0, 10)
-                              : mySubmission != null 
-                                  ? Colors.orange.shade600
-                                  : Colors.red.shade600,
                           fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
                         ),
                       ),
+                      if (mySubmission!.isGraded && mySubmission!.feedback != null && mySubmission!.feedback!.isNotEmpty) ...[
+                        SizedBox(height: 12),
+                        Text(
+                          'Feedback do Professor:',
+                          style: TextStyle(
+                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            mySubmission!.feedback!,
+                            style: TextStyle(
+                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              fontSize: 13,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
                 SizedBox(height: 20),
-
-                // Submission Status Section
-                if (mySubmission != null) ...[
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: mySubmission!.isGraded ? Colors.green.shade50 : Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: mySubmission!.isGraded ? Colors.green.shade200 : Colors.blue.shade200,
+              ],
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Descrição:',
+                      style: TextStyle(
+                        fontSize: isDesktop ? 18 : 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              mySubmission!.isGraded ? Icons.check_circle : Icons.upload_file,
-                              color: mySubmission!.isGraded ? Colors.green : Colors.blue,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              mySubmission!.isGraded ? 'Atividade Avaliada' : 'Atividade Entregue',
-                              style: TextStyle(
-                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                fontWeight: FontWeight.bold,
-                                color: mySubmission!.isGraded ? Colors.green.shade700 : Colors.blue.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Entregue em: ${DateFormat('dd/MM/yyyy HH:mm').format(mySubmission!.submittedAt)}',
-                          style: TextStyle(
-                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        if (mySubmission!.isGraded && mySubmission!.feedback != null && mySubmission!.feedback!.isNotEmpty) ...[
-                          SizedBox(height: 12),
-                          Text(
-                            'Feedback do Professor:',
-                            style: TextStyle(
-                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              mySubmission!.feedback!,
-                              style: TextStyle(
-                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                fontSize: 13,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                ],
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Descrição:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: isDesktop ? MediaQuery.of(context).size.width : null,
+                      child: Text(
                         assignment!.description,
                         style: TextStyle(
                           fontSize: 16,
@@ -427,259 +711,236 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                           fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Anexos:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                        ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Anexos da Atividade:',
+                      style: TextStyle(
+                        fontSize: isDesktop ? 18 : 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                       ),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        height: 100,
-                        child: assignment!.attachments != null && assignment!.attachments!.isNotEmpty
-                            ? ListView.builder(
-                                itemBuilder: (context, index) {
-                                  final attachment = assignment!.attachments![index];
-                                  return ListTile(
-                                    leading: Icon(Icons.attach_file),
-                                    title: Text(
-                                      attachment.fileName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.blue.shade800,
-                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                      ),
+                    ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      height: 100,
+                      width: isDesktop ? MediaQuery.of(context).size.width : null,
+                      child: assignment!.attachments != null && assignment!.attachments!.isNotEmpty
+                          ? ListView.builder(
+                              itemBuilder: (context, index) {
+                                final attachment = assignment!.attachments![index];
+                                return ListTile(
+                                  leading: Icon(Icons.attach_file),
+                                  title: Text(
+                                    attachment.fileName,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blue.shade800,
+                                      fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                     ),
-                                    onTap: () {
-                                      // Logic to open attachment
-                                    },
-                                  );
-                                },
-                                itemCount: assignment!.attachments!.length,
-                              )
-                            : Center(
-                                child: Text(
-                                  'Nenhum anexo disponível.',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey.shade800,
-                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                   ),
-                                ),
-                              ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'Meus anexos:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-
-                      // Show uploaded files if submission exists
-                      if (mySubmission != null && userAttachments.isNotEmpty) ...[
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Column(
-                            children: userAttachments.asMap().entries.map((entry) {
-                              final attachment = entry.value;
-                              return ListTile(
-                                leading: Icon(Icons.attach_file, color: Colors.blue),
-                                title: Text(
-                                  attachment.fileName,
-                                  style: TextStyle(
-                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                  ),
-                                ),
-                                subtitle: mySubmission?.submittedAt != null 
-                                    ? Text(
-                                        'Enviado em: ${DateFormat('dd/MM/yyyy HH:mm').format(mySubmission!.submittedAt)}',
-                                        style: TextStyle(
-                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                          fontSize: 12,
-                                        ),
-                                      )
-                                    : null,
-                                trailing: mySubmission == null 
-                                    ? IconButton(
-                                        icon: Icon(Icons.delete, color: Colors.red),
-                                        onPressed: () => _removeAttachment(entry.key),
-                                      )
-                                    : Icon(Icons.check_circle, color: Colors.green),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                      ],
-
-                      // File picker container
-                      if (mySubmission == null) ...[
-                        Container(
-                          height: 150,
-                          margin: EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey.shade400,
-                              style: BorderStyle.solid,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  icon: isPickingFiles 
-                                      ? SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        )
-                                      : Icon(
-                                          Icons.add,
-                                          size: 40,
-                                          color: Colors.grey,
-                                        ),
-                                  onPressed: isPickingFiles ? null : _pickFiles,
-                                ),
-                                Text(
-                                  isPickingFiles ? 'Anexando arquivos...' : 'Adicionar anexo',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade600,
-                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Toque no ícone acima para adicionar seus próprios anexos para esta tarefa.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                          ),
-                        ),
-                      ] else ...[
-                        Text(
-                          'Tarefa já foi entregue. Para fazer alterações, entre em contato com o professor.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                      SizedBox(height: 30),
-                      if (mySubmission == null) ...[
-                        AbsorbPointer(
-                          absorbing: isSubmissionLoading || userAttachments.isEmpty,
-                          child: Opacity(
-                            opacity: isSubmissionLoading || userAttachments.isEmpty ? 0.6 : 1.0,
-                            child: Button(
-                              backgroundColor: course!.colorAsFlutterColor,
-                              text: isSubmissionLoading ? 'Enviando...' : 'Enviar Tarefa',
-                              onPressed: () => _submitAssignment(),
-                            ),
-                          ),
-                        ),
-                        if (userAttachments.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              'Adicione pelo menos um arquivo para enviar a tarefa.',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.orange.shade700,
-                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                      ] else ...[
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade100,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.green.shade300),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(Icons.check_circle, color: Colors.green.shade700, size: 32),
-                              SizedBox(height: 8),
-                              Text(
-                                'Tarefa Entregue com Sucesso!',
+                                  onTap: () {
+                                    api.downloadFile(attachment.filePath);
+                                  },
+                                );
+                              },
+                              itemCount: assignment!.attachments!.length,
+                            )
+                          : Center(
+                              child: Text(
+                                'Nenhum anexo disponível.',
                                 style: TextStyle(
-                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green.shade700,
                                   fontSize: 16,
+                                  color: Colors.grey.shade800,
+                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                 ),
                               ),
-                              Text(
-                                mySubmission!.isGraded 
-                                    ? 'Sua tarefa foi avaliada pelo professor.'
-                                    : 'Aguarde a correção do professor.',
+                            ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Meus anexos:',
+                      style: TextStyle(
+                        fontSize: isDesktop ? 18 : 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+
+                    // Show uploaded files if submission exists
+                    if (mySubmission != null && userAttachments.isNotEmpty) ...[
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Column(
+                          children: userAttachments.asMap().entries.map((entry) {
+                            final attachment = entry.value;
+                            return ListTile(
+                              leading: Icon(Icons.attach_file, color: Colors.blue),
+                              title: Text(
+                                attachment.fileName,
                                 style: TextStyle(
                                   fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                  color: Colors.green.shade600,
+                                ),
+                              ),
+                              subtitle: mySubmission?.submittedAt != null 
+                                  ? Text(
+                                      'Enviado em: ${DateFormat('dd/MM/yyyy HH:mm').format(mySubmission!.submittedAt)}',
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                        fontSize: 12,
+                                      ),
+                                    )
+                                  : null,
+                              trailing: mySubmission == null 
+                                  ? IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => _removeAttachment(entry.key),
+                                    )
+                                  : Icon(Icons.check_circle, color: Colors.green),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+
+                    // File picker container
+                    if (mySubmission == null) ...[
+                      Container(
+                        height: 150,
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey.shade400,
+                            style: BorderStyle.solid,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: isPickingFiles 
+                                    ? SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : Icon(
+                                        Icons.add,
+                                        size: 40,
+                                        color: Colors.grey,
+                                      ),
+                                onPressed: isPickingFiles ? null : _pickFiles,
+                              ),
+                              Text(
+                                isPickingFiles ? 'Anexando arquivos...' : 'Adicionar anexo',
+                                style: TextStyle(
                                   fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ],
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Toque no ícone acima para adicionar seus próprios anexos para esta tarefa.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                        ),
+                      ),
+                    ] else ...[
+                      Text(
+                        'Tarefa já foi entregue. Para fazer alterações, entre em contato com o professor.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
                     ],
-                  ),
+                    SizedBox(height: 30),
+                    if (mySubmission == null) ...[
+                      AbsorbPointer(
+                        absorbing: isSubmissionLoading || userAttachments.isEmpty,
+                        child: Opacity(
+                          opacity: isSubmissionLoading || userAttachments.isEmpty ? 0.6 : 1.0,
+                          child: Button(
+                            backgroundColor: course!.colorAsFlutterColor,
+                            text: isSubmissionLoading ? 'Enviando...' : 'Enviar Tarefa',
+                            onPressed: () => _submitAssignment(),
+                          ),
+                        ),
+                      ),
+                      if (userAttachments.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Adicione pelo menos um arquivo para enviar a tarefa.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange.shade700,
+                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                    ] else ...[
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green.shade300),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.green.shade700, size: 32),
+                            SizedBox(height: 8),
+                            Text(
+                              'Tarefa Entregue com Sucesso!',
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade700,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              mySubmission!.isGraded 
+                                  ? 'Sua tarefa foi avaliada pelo professor.'
+                                  : 'Aguarde a correção do professor.',
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                color: Colors.green.shade600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        iconSize: 24,
-        selectedItemColor: Colors.blue,
-        selectedLabelStyle: TextStyle(
-          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-          fontSize: 12,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-          fontSize: 12,
-        ),
-        currentIndex: 2,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Atividades',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
       ),
     );
   }

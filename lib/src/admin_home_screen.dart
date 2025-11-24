@@ -3,19 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/main.dart';
-import 'package:polieats_frontend/src/assignment_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
-import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/admin_assignment_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
+import 'package:polieats_frontend/src/assignment_overview_screen.dart';
 import 'package:polieats_frontend/src/create_assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
-import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/helpers/icon_map.dart';
 import 'package:polieats_frontend/src/management_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
+import 'package:polieats_frontend/src/select_students_screen.dart';
 import 'package:polieats_frontend/src/widgets/components/course_dropdown.dart';
 import 'package:polieats_frontend/src/widgets/components/create_notice_dialog.dart';
 import 'package:polieats_frontend/src/widgets/components/no_courses_state.dart';
@@ -756,7 +754,7 @@ class AdminMobileHomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatScreen(professorID: 1234),
+                builder: (context) => SelectProfessorScreen(),
               ),
             );
         }
@@ -943,7 +941,14 @@ class AdminDesktopHomeScreen extends StatelessWidget {
                       ListTile(
                         leading: Icon(Icons.assignment),
                         title: Text('Atividades'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AssignmentOverviewScreen(subjectId: course!.id),
+                            ),
+                          );
+                        },
                       ),
                       ListTile(
                         leading: Icon(Icons.person),
@@ -964,7 +969,7 @@ class AdminDesktopHomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(professorID: 1234),
+                              builder: (context) => SelectStudentsScreen(),
                             ),
                           );
                         },
@@ -1190,16 +1195,27 @@ class AdminDesktopHomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
+            ],
+          ),
+        ),
               ),
             ],
           ),
         ),
       ),
-    );
+    );  
   }
+
+  // Widget _buildStatCard(String title, String value, IconData icon) {
+  //   return Container(
+  //     padding: EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(8),
+  //       border: Border.all(color: Colors.grey.shade200),
+  //     ),
+  //   );
+  // }
 
   Widget _buildStatCard(String title, String value, IconData icon) {
     return Container(

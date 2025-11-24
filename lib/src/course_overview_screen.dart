@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/admin_home_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/widgets/course_overview_card.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
@@ -234,7 +234,7 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(professorID: 1234),
+                              builder: (context) => SelectProfessorScreen(),
                             ),
                           );
                         },

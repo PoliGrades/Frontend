@@ -3,13 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/admin_home_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/data/Submissions.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/management_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 // Student Submission class for admin view
@@ -544,7 +544,7 @@ class _AdminAssignmentScreenState extends State<AdminAssignmentScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatScreen(professorID: 1234),
+                    builder: (context) => SelectProfessorScreen(),
                   ),
                 );
               },
@@ -703,7 +703,7 @@ class _AdminAssignmentScreenState extends State<AdminAssignmentScreen> {
                                     ),
                                   ),
                                   onTap: () {
-                                    // Logic to open attachment
+                                    api.downloadFile(attachment.filePath);
                                   },
                                 );
                               },
@@ -1027,7 +1027,7 @@ class _AdminAssignmentScreenState extends State<AdminAssignmentScreen> {
                       ),
                       trailing: Icon(Icons.download),
                       onTap: () {
-                        // Download file logic
+                        api.downloadFile(attachment.filePath);
                       },
                     );
                   },

@@ -4,19 +4,18 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/assignment_overview_screen.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/helpers/icon_map.dart';
+import 'package:polieats_frontend/src/notices_overview_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/widgets/components/no_courses_state.dart';
 import 'package:polieats_frontend/src/widgets/components/user_header.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:polieats_frontend/src/notices_overview_screen.dart';
-import 'package:polieats_frontend/src/select_professor_screen.dart';        
 
 import '../main.dart';
 
@@ -220,7 +219,7 @@ class MobileHomeScreen extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfileScreen()));
                 break;
               case 4:
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatScreen(professorID: 1234,)));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectProfessorScreen()));
             }
           },
           items: const <BottomNavigationBarItem>[
@@ -940,7 +939,7 @@ class MobileHomeScreen extends StatelessWidget {
             case 4:
               Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),)));
+              ).push(MaterialPageRoute(builder: (context) => SelectProfessorScreen()));
           }
         },
         items: const <BottomNavigationBarItem>[
@@ -999,9 +998,6 @@ class DesktopHomeScreen extends StatelessWidget {
         ),
       );
     }
-
-    final noticesController = Notices();
-    final notices = noticesController.notices;
 
     final appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
     final dividerHeight = size.height - appBarHeight;
@@ -1071,6 +1067,10 @@ class DesktopHomeScreen extends StatelessWidget {
                         selectedColor: Colors.white,
                         title: Text('Perfil'),
                         onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProfileScreen()),
+                          );
                         },
                       ),
                       ListTile(
@@ -1080,7 +1080,7 @@ class DesktopHomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SelectProfessorScreen(),
+                              builder: (context) => SelectProfessorScreen()
                             ),
                           );
                         },
@@ -1125,630 +1125,620 @@ class DesktopHomeScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 40),
-                      Row(
+                      // Create a structured layout with cards
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 30,
                         children: [
-                          Expanded(
-                            flex: 5,
-                            child: Column(
-                              spacing: 20,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Matérias',
-                                  style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.leagueSpartan().fontFamily,
-                                    fontSize: 20,
+                          // Top row with courses and calendar
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Courses section
+                              Expanded(
+                                flex: 2,
+                                child: Card(
+                                  elevation: 2,
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                ),
-                                // Grid of courses
-                                SizedBox(
-                                  height: 650,
-                                  child: courses.isEmpty
-                                      ? Center(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.school_outlined,
-                                                size: 64,
-                                                color: Colors.grey.shade400,
-                                              ),
-                                              SizedBox(height: 16),
-                                              Text(
-                                                "Nenhuma matéria encontrada",
-                                                style: TextStyle(
-                                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                                  fontSize: 18,
-                                                  color: Colors.grey.shade600,
-                                                ),
-                                              ),
-                                              Text(
-                                                "Suas matérias aparecerão aqui",
-                                                style: TextStyle(
-                                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                                                  fontSize: 14,
-                                                  color: Colors.grey.shade400,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : GridView.builder(
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: 3,
-                                                crossAxisSpacing: 10,
-                                                mainAxisSpacing: 10,
-                                                childAspectRatio: 1,
-                                              ),
-                                          itemCount: courses.length,
-                                          itemBuilder: (context, index) {
-                                            final course = courses[index];
-
-                                            return Material(
-                                              color: Colors.grey.shade50,
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(10),
-                                              ),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  // Go to the specific course page
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          CourseScreen(
-                                                            course: course,
-                                                          ),
-                                                    ),
-                                                  );
-                                                },
-                                                child: SizedBox(
-                                                  // Adjust to max height
-                                                  height: 200,
-                                                  width: size.width * 0.3,
-                                                  child: Center(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.center,
-                                                      children: [
-                                                        Container(
-                                                          width: 50,
-                                                          height: 50,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius.all(
-                                                                  Radius.circular(
-                                                                    1000,
-                                                                  ),
-                                                                ),
-                                                            color: course.accentColorAsFlutterColor,
-                                                          ),
-                                                          child: Icon(
-                                                            iconMap[course.name] ?? Icons.help,
-                                                            size: 30,
-                                                            color: course.colorAsFlutterColor,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 10),
-                                                        Text(
-                                                          course.name,
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                GoogleFonts.leagueSpartan()
-                                                                    .fontFamily,
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // SizedBox(width: 16),
-                          Expanded(
-                            flex: 5,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // List of activities
-                                SizedBox(
-                                  height: 500,
-                                  child: SfCalendar(
-                                    dataSource: AssignmentDataSource(
-                                      assignments,
-                                    ),
-                                    viewHeaderHeight: 50,
-                                    todayHighlightColor: Color.fromARGB(255, 45, 176, 194),
-                                    showDatePickerButton: true,
-                                    selectionDecoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      border: Border.all(
-                                        color: Color.fromARGB(255, 45, 176, 194),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(4),
-                                      ),
-                                    ),
-                                    headerStyle: CalendarHeaderStyle(
-                                      backgroundColor: Colors.transparent,
-                                      textAlign: TextAlign.center,
-                                      textStyle: TextStyle(
-                                        fontFamily: GoogleFonts.leagueSpartan()
-                                            .fontFamily,
-                                        fontSize: 18,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    view: CalendarView.month,
-                                    monthViewSettings: MonthViewSettings(
-                                      showAgenda: true,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        color: Colors.white12,
-                        width: double.infinity,
-                        height: 250,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          spacing: 15,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Últimas atividades",
-                                  style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.leagueSpartan().fontFamily,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue.shade100,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Ver todas",
-                                    style: TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                physics: BouncingScrollPhysics(),
-                                itemCount: assignments.length,
-                                separatorBuilder: (context, index) {
-                                  return SizedBox(width: 10);
-                                },
-                                itemBuilder: (context, index) {
-                                  final assignment = assignments[index];
-                                  final course = coursesController
-                                      .getCourseByName(assignment.course);
-
-                                  return Material(
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AssignmentScreen(
-                                                  assignment: assignment,
-                                                ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        width: size.width * 0.2,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(10),
-                                          ),
-                                          color: Colors.grey.shade50,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Container(
-                                              height: 100,
-                                              decoration: BoxDecoration(
-                                                color: course!.color,
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  topRight: Radius.circular(10),
-                                                ),
-                                              ),
-                                              child: Stack(
-                                                children: [
-                                                  Positioned(
-                                                    top: 8,
-                                                    left: 8,
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                            vertical: 4,
-                                                            horizontal: 8,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white70,
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                              Radius.circular(
-                                                                20,
-                                                              ),
-                                                            ),
-                                                      ),
-                                                      child: Text(
-                                                        f.format(
-                                                          assignment.dueDate,
-                                                        ),
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              GoogleFonts.leagueSpartan()
-                                                                  .fontFamily,
-                                                          fontSize: 12,
-                                                          color: course.color,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    bottom: -12,
-                                                    right: 8,
-                                                    child: Icon(
-                                                      course.icon,
-                                                      size: 64,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ],
+                                            Text(
+                                              'Minhas matérias',
+                                              style: TextStyle(
+                                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            SizedBox(height: 10),
-                                            Container(
-                                              padding: EdgeInsets.only(
-                                                left: 10,
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => CourseOverviewScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.blue.shade100,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    assignment.title,
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          GoogleFonts.leagueSpartan()
-                                                              .fontFamily,
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    assignment.course,
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          GoogleFonts.leagueSpartan()
-                                                              .fontFamily,
-                                                      fontSize: 12,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                ],
+                                              child: Text(
+                                                "Ver todas",
+                                                style: TextStyle(
+                                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Quadro de avisos
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 5,
-                        ),
-                        color: Colors.white12,
-                        width: size.width,
-                        height: 250,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          spacing: 15,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Quadro de avisos",
-                                  style: TextStyle(
-                                    fontFamily:
-                                        GoogleFonts.leagueSpartan().fontFamily,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue.shade100,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Ver todos",
-                                    style: TextStyle(
-                                      fontFamily: GoogleFonts.leagueSpartan()
-                                          .fontFamily,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                physics: BouncingScrollPhysics(),
-                                itemCount: notices.length,
-                                separatorBuilder: (context, index) {
-                                  return SizedBox(width: 10);
-                                },
-                                itemBuilder: (context, index) {
-                                  final notice = notices[index];
-                                  final course = coursesController
-                                      .getCourseByName(notice.course);
-                                  return GestureDetector(
-                                    child: Container(
-                                      width: size.width * 0.2,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(10),
-                                        ),
-                                        color: Colors.grey.shade50,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      width: 30,
-                                                      height: 30,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                              Radius.circular(
-                                                                1000,
-                                                              ),
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          height: 300,
+                                          child: courses.isEmpty
+                                              ? Center(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.school_outlined,
+                                                        size: 48,
+                                                        color: Colors.grey.shade400,
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text(
+                                                        "Nenhuma matéria encontrada",
+                                                        style: TextStyle(
+                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                          fontSize: 16,
+                                                          color: Colors.grey.shade600,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Suas matérias aparecerão aqui",
+                                                        style: TextStyle(
+                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                          fontSize: 12,
+                                                          color: Colors.grey.shade400,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : GridView.builder(
+                                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount: 3,
+                                                    crossAxisSpacing: 10,
+                                                    mainAxisSpacing: 10,
+                                                    childAspectRatio: 1,
+                                                  ),
+                                                  itemCount: courses.length,
+                                                  itemBuilder: (context, index) {
+                                                    final course = courses[index];
+                                                    return Material(
+                                                      color: Colors.grey.shade50,
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => CourseScreen(course: course),
                                                             ),
-                                                        color:
-                                                            course!.accentColor,
+                                                          );
+                                                        },
+                                                        child: Center(
+                                                          child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Container(
+                                                                width: 40,
+                                                                height: 40,
+                                                                decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.circular(20),
+                                                                  color: course.accentColorAsFlutterColor,
+                                                                ),
+                                                                child: Icon(
+                                                                  iconMap[course.name] ?? Icons.help,
+                                                                  size: 24,
+                                                                  color: course.colorAsFlutterColor,
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 8),
+                                                              Text(
+                                                                course.name,
+                                                                style: TextStyle(
+                                                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                                  fontSize: 12,
+                                                                  fontWeight: FontWeight.bold,
+                                                                ),
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
                                                       ),
-                                                      child: Icon(
-                                                        course.icon,
-                                                        size: 20,
-                                                        color: course.color,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      f.format(notice.date),
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            GoogleFonts.leagueSpartan()
-                                                                .fontFamily,
-                                                        fontSize: 12,
-                                                        color: Colors
-                                                            .grey
-                                                            .shade700,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                    );
+                                                  },
                                                 ),
-                                                SizedBox(height: 12),
-                                                Text(
-                                                  notice.title,
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 4),
-                                                Text(
-                                                  notice.content,
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 20),
+                              // Calendar section
+                              Expanded(
+                                flex: 2,
+                                child: Card(
+                                  elevation: 2,
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Calendário',
+                                          style: TextStyle(
+                                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          height: 300,
+                                          child: SfCalendar(
+                                            dataSource: AssignmentDataSource(assignments),
+                                            viewHeaderHeight: 40,
+                                            todayHighlightColor: Color.fromARGB(255, 45, 176, 194),
+                                            showDatePickerButton: true,
+                                            selectionDecoration: BoxDecoration(
+                                              color: Colors.transparent,
+                                              border: Border.all(
+                                                color: Color.fromARGB(255, 45, 176, 194),
+                                                width: 2,
+                                              ),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            headerStyle: CalendarHeaderStyle(
+                                              backgroundColor: Colors.transparent,
+                                              textAlign: TextAlign.center,
+                                              textStyle: TextStyle(
+                                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            view: CalendarView.month,
+                                            monthViewSettings: MonthViewSettings(
+                                              showAgenda: false,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                        isScrollControlled: true,
-                                        context: context,
-                                        builder: (context) {
-                                          return Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                    top: Radius.circular(16),
-                                                  ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          // Bottom row with assignments and notices
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Assignments section
+                              Expanded(
+                                flex: 2,
+                                child: Card(
+                                  elevation: 2,
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Últimas atividades',
+                                              style: TextStyle(
+                                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                            height:
-                                                MediaQuery.of(
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
                                                   context,
-                                                ).size.height *
-                                                0.95,
-                                            padding: EdgeInsets.all(16),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Container(
+                                                  MaterialPageRoute(
+                                                    builder: (context) => AssignmentOverviewScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.blue.shade100,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                "Ver todas",
+                                                style: TextStyle(
+                                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          height: 280,
+                                          child: assignments.isEmpty
+                                              ? Center(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.assignment_outlined,
+                                                        size: 48,
+                                                        color: Colors.grey.shade400,
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text(
+                                                        "Nenhuma atividade encontrada",
+                                                        style: TextStyle(
+                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                          fontSize: 16,
+                                                          color: Colors.grey.shade600,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Suas atividades aparecerão aqui",
+                                                        style: TextStyle(
+                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                          fontSize: 12,
+                                                          color: Colors.grey.shade400,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : ListView.builder(
+                                                  itemCount: assignments.length > 5 ? 5 : assignments.length,
+                                                  itemBuilder: (context, index) {
+                                                    final assignment = assignments[index];
+                                                    final classCourse = globals.classController.getClassById(assignment.classId);
+                                                    final course = globals.courseController.getSubjectById(classCourse?.subjectId ?? -1);
+
+                                                    if (course == null) {
+                                                      return SizedBox.shrink();
+                                                    }
+
+                                                    return Container(
+                                                      margin: EdgeInsets.only(bottom: 12),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        color: Colors.grey.shade50,
+                                                      ),
+                                                      child: ListTile(
+                                                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                        leading: Container(
                                                           width: 40,
                                                           height: 40,
                                                           decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius.all(
-                                                                  Radius.circular(
-                                                                    1000,
-                                                                  ),
-                                                                ),
-                                                            color: course
-                                                                .accentColor,
+                                                            borderRadius: BorderRadius.circular(20),
+                                                            color: course.colorAsFlutterColor,
                                                           ),
                                                           child: Icon(
-                                                            course.icon,
-                                                            size: 30,
-                                                            color: course.color,
+                                                            Icons.assignment,
+                                                            color: Colors.white,
+                                                            size: 20,
                                                           ),
                                                         ),
-                                                        SizedBox(width: 16),
-                                                        Text(
+                                                        title: Text(
+                                                          assignment.title,
+                                                          style: TextStyle(
+                                                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                        subtitle: Text(
                                                           course.name,
                                                           style: TextStyle(
-                                                            fontFamily:
-                                                                GoogleFonts.leagueSpartan()
-                                                                    .fontFamily,
-                                                            fontSize: 20,
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                            fontSize: 12,
+                                                            color: Colors.grey.shade600,
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
-                                                    IconButton(
-                                                      icon: Icon(Icons.close),
-                                                      onPressed: () {
-                                                        Navigator.of(
-                                                          context,
-                                                        ).pop();
-                                                      },
-                                                    ),
-                                                  ],
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => AssignmentScreen(
+                                                                assignmentId: assignment.id,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
-                                                SizedBox(height: 20),
-                                                Text(
-                                                  notice.title,
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  'Publicado em: ${f.format(notice.date)},\npor ${notice.owner}',
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 14,
-                                                    color: Colors.grey.shade700,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 20),
-                                                Text(
-                                                  notice.content,
-                                                  style: TextStyle(
-                                                    fontFamily:
-                                                        GoogleFonts.leagueSpartan()
-                                                            .fontFamily,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                              SizedBox(width: 20),
+                              // Notices section
+                              Expanded(
+                                flex: 2,
+                                child: Card(
+                                  elevation: 2,
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Quadro de avisos',
+                                              style: TextStyle(
+                                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => NoticesOverviewScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.blue.shade100,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                "Ver todos",
+                                                style: TextStyle(
+                                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          height: 280,
+                                          child: notices.isEmpty
+                                              ? Center(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.campaign_outlined,
+                                                        size: 48,
+                                                        color: Colors.grey.shade400,
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text(
+                                                        "Nenhum aviso encontrado",
+                                                        style: TextStyle(
+                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                          fontSize: 16,
+                                                          color: Colors.grey.shade600,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "Seus avisos aparecerão aqui",
+                                                        style: TextStyle(
+                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                          fontSize: 12,
+                                                          color: Colors.grey.shade400,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : ListView.builder(
+                                                  itemCount: notices.length > 4 ? 4 : notices.length,
+                                                  itemBuilder: (context, index) {
+                                                    final notice = notices[index];
+                                                    final course = globals.courseController.getSubjectByName(notice.course);
+
+                                                    if (course == null) {
+                                                      return SizedBox.shrink();
+                                                    }
+
+                                                    return Container(
+                                                      margin: EdgeInsets.only(bottom: 12),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        color: Colors.grey.shade50,
+                                                      ),
+                                                      child: ListTile(
+                                                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                        leading: Container(
+                                                          width: 40,
+                                                          height: 40,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(20),
+                                                            color: course.accentColorAsFlutterColor,
+                                                          ),
+                                                          child: Icon(
+                                                            iconMap[course.name] ?? Icons.help,
+                                                            color: course.colorAsFlutterColor,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                        title: Text(
+                                                          notice.title,
+                                                          style: TextStyle(
+                                                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                        subtitle: Text(
+                                                          notice.content.length > 50 
+                                                            ? '${notice.content.substring(0, 50)}...'
+                                                            : notice.content,
+                                                          style: TextStyle(
+                                                            fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                            fontSize: 12,
+                                                            color: Colors.grey.shade600,
+                                                          ),
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                        onTap: () {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (context) {
+                                                              final f = DateFormat('dd/MM/yyyy', 'pt_BR');
+                                                              return AlertDialog(
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(16),
+                                                                ),
+                                                                title: Row(
+                                                                  children: [
+                                                                    Container(
+                                                                      width: 30,
+                                                                      height: 30,
+                                                                      decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(15),
+                                                                        color: course.accentColorAsFlutterColor,
+                                                                      ),
+                                                                      child: Icon(
+                                                                        iconMap[course.name] ?? Icons.help,
+                                                                        size: 16,
+                                                                        color: course.colorAsFlutterColor,
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(width: 12),
+                                                                    Expanded(
+                                                                      child: Text(
+                                                                        course.name,
+                                                                        style: TextStyle(
+                                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                                          fontSize: 16,
+                                                                          fontWeight: FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                content: SingleChildScrollView(
+                                                                  child: Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    mainAxisSize: MainAxisSize.min,
+                                                                    children: [
+                                                                      Text(
+                                                                        notice.title,
+                                                                        style: TextStyle(
+                                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                                          fontSize: 18,
+                                                                          fontWeight: FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 8),
+                                                                      Text(
+                                                                        'Publicado em: ${f.format(notice.date)}\npor ${notice.owner}',
+                                                                        style: TextStyle(
+                                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                                          fontSize: 12,
+                                                                          color: Colors.grey.shade700,
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 16),
+                                                                      Text(
+                                                                        notice.content,
+                                                                        style: TextStyle(
+                                                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                                          fontSize: 14,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed: () => Navigator.of(context).pop(),
+                                                                    child: Text(
+                                                                      'Fechar',
+                                                                      style: TextStyle(
+                                                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),

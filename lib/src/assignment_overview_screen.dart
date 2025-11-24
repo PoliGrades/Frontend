@@ -4,23 +4,26 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/admin_home_screen.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/widgets/assignment_overview_card.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 class AssignmentOverviewScreen extends StatefulWidget{
-  const AssignmentOverviewScreen({super.key});
+  const AssignmentOverviewScreen({super.key, this.subjectId = 0});
+  final int subjectId;
+
     @override
   State<StatefulWidget> createState() => _AssignmentOverviewScreen();    
 }
 
 class _AssignmentOverviewScreen extends State<AssignmentOverviewScreen> {
-  late final List<Assignment> assigments;
+    List<Assignment> assigments = []; // Initialize as empty list instead of late
+  bool _isLoading = true; // Add loading state
   final colorScheme = ColorScheme.fromSeed(
     seedColor: Color.fromARGB(255, 45, 176, 194),
   );
@@ -28,9 +31,30 @@ class _AssignmentOverviewScreen extends State<AssignmentOverviewScreen> {
   int _selectedIndex = 2;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    assigments = globals.tasksController.allTasks;
+    _loadAssignments();
+  }
+
+  void _loadAssignments() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      if (globals.currentUser.role == UserRole.STUDENT) {
+        assigments = globals.tasksController.allTasks;
+      } else {
+        assigments = await api.fetchAssignmentsForSubject(widget.subjectId);
+      }
+    } catch (e) {
+      // Handle error if needed
+      print('Error loading assignments: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _onItemTapped(int index){
@@ -64,6 +88,17 @@ class _AssignmentOverviewScreen extends State<AssignmentOverviewScreen> {
   Widget build(BuildContext context) {
     initializeDateFormatting('pt_BR', null);
     final f = DateFormat('dd/MM/yyyy', 'pt_BR');
+
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: colorScheme.primary,
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: colorScheme.primary,
@@ -288,7 +323,7 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(professorID: 1234),
+                              builder: (context) => SelectProfessorScreen(),
                             ),
                           );
                         },

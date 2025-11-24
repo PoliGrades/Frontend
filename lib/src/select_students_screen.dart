@@ -11,29 +11,29 @@ import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 import '../main.dart';
 
-class SelectProfessorScreen extends StatefulWidget {
-  const SelectProfessorScreen({super.key});
+class SelectStudentsScreen extends StatefulWidget {
+  const SelectStudentsScreen({super.key});
 
   @override
-  _SelectProfessorScreenState createState() => _SelectProfessorScreenState();
+  _SelectStudentsScreenState createState() => _SelectStudentsScreenState();
 }
 
-class _SelectProfessorScreenState extends State<SelectProfessorScreen> {
-  late Future<List<User>> _professorsFuture;
+class _SelectStudentsScreenState extends State<SelectStudentsScreen> {
+  late Future<List<User>> _studentsFuture;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadProfessors();
+    _loadStudents();
   }
 
-  Future<void> _loadProfessors() async {
+  Future<void> _loadStudents() async {
     setState(() {
       isLoading = true;
     });
     
-    _professorsFuture = api.fetchProfessors();
+    _studentsFuture = api.fetchStudents();
     
     setState(() {
       isLoading = false;
@@ -52,7 +52,7 @@ class _SelectProfessorScreenState extends State<SelectProfessorScreen> {
               CircularProgressIndicator(color: Colors.blue),
               SizedBox(height: 20),
               Text(
-                "Carregando professores...",
+                "Carregando estudantes...",
                 style: TextStyle(
                   fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                   fontSize: 16,
@@ -70,9 +70,9 @@ class _SelectProfessorScreenState extends State<SelectProfessorScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return DesktopSelectProfessorScreen(professorsFuture: _professorsFuture);
+            return DesktopSelectStudentsScreen(studentsFuture: _studentsFuture);
           } else {
-            return MobileSelectProfessorScreen(professorsFuture: _professorsFuture);
+            return MobileSelectStudentsScreen(studentsFuture: _studentsFuture);
           }
         },
       ),
@@ -80,12 +80,12 @@ class _SelectProfessorScreenState extends State<SelectProfessorScreen> {
   }
 }
 
-class MobileSelectProfessorScreen extends StatelessWidget {
-  final Future<List<User>> professorsFuture;
+class MobileSelectStudentsScreen extends StatelessWidget {
+  final Future<List<User>> studentsFuture;
 
-  const MobileSelectProfessorScreen({
+  const MobileSelectStudentsScreen({
     super.key,
-    required this.professorsFuture,
+    required this.studentsFuture,
   });
 
   @override
@@ -107,7 +107,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      'Chat com Professores',
+                      'Chat com Estudantes',
                       style: TextStyle(
                         fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                         fontSize: 24,
@@ -118,7 +118,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 FutureBuilder<List<User>>(
-                  future: professorsFuture,
+                  future: studentsFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
@@ -127,7 +127,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                             CircularProgressIndicator(),
                             SizedBox(height: 16),
                             Text(
-                              'Carregando professores...',
+                              'Carregando estudantes...',
                               style: TextStyle(
                                 fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                 fontSize: 16,
@@ -144,7 +144,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                             Icon(Icons.error, size: 64, color: Colors.red),
                             SizedBox(height: 16),
                             Text(
-                              'Erro ao carregar professores',
+                              'Erro ao carregar estudantes',
                               style: TextStyle(
                                 fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                 fontSize: 18,
@@ -165,16 +165,16 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                       );
                     }
 
-                    final professors = snapshot.data ?? [];
+                    final students = snapshot.data ?? [];
 
-                    if (professors.isEmpty) {
+                    if (students.isEmpty) {
                       return Center(
                         child: Column(
                           children: [
-                            Icon(Icons.school_outlined, size: 64, color: Colors.grey.shade400),
+                            Icon(Icons.person_outline, size: 64, color: Colors.grey.shade400),
                             SizedBox(height: 16),
                             Text(
-                              'Nenhum professor disponível',
+                              'Nenhum estudante disponível',
                               style: TextStyle(
                                 fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                 fontSize: 18,
@@ -197,10 +197,10 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                     return ListView.separated(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: professors.length,
+                      itemCount: students.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
-                        final prof = professors[index];
+                        final student = students[index];
                         return Card(
                           elevation: 0,
                           color: Colors.grey.shade50,
@@ -213,7 +213,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ChatScreen(recipient: prof),
+                                  builder: (context) => ChatScreen(recipient: student),
                                 ),
                               );
                             },
@@ -232,7 +232,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          prof.name,
+                                          student.name,
                                           style: TextStyle(
                                             fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                             fontSize: 18,
@@ -241,7 +241,7 @@ class MobileSelectProfessorScreen extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          prof.email,
+                                          student.email,
                                           style: TextStyle(
                                             fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                             fontSize: 14,
@@ -325,12 +325,12 @@ class MobileSelectProfessorScreen extends StatelessWidget {
   }
 }
 
-class DesktopSelectProfessorScreen extends StatelessWidget {
-  final Future<List<User>> professorsFuture;
+class DesktopSelectStudentsScreen extends StatelessWidget {
+  final Future<List<User>> studentsFuture;
 
-  const DesktopSelectProfessorScreen({
+  const DesktopSelectStudentsScreen({
     super.key,
-    required this.professorsFuture,
+    required this.studentsFuture,
   });
 
   @override
@@ -438,7 +438,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Chat com Professores',
+                    'Chat com Estudantes',
                     style: TextStyle(
                       fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                       fontSize: 32,
@@ -447,7 +447,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Selecione um professor para iniciar uma conversa.',
+                    'Selecione um estudante para iniciar uma conversa.',
                     style: TextStyle(
                       fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                       fontSize: 18,
@@ -457,7 +457,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                   SizedBox(height: 40),
                   Expanded(
                     child: FutureBuilder<List<User>>(
-                      future: professorsFuture,
+                      future: studentsFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
@@ -467,7 +467,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                                 CircularProgressIndicator(color: const Color.fromARGB(255, 45, 176, 194)),
                                 SizedBox(height: 20),
                                 Text(
-                                  'Carregando professores...',
+                                  'Carregando estudantes...',
                                   style: TextStyle(
                                     fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                     fontSize: 18,
@@ -485,7 +485,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                                 Icon(Icons.error, size: 80, color: Colors.red),
                                 SizedBox(height: 20),
                                 Text(
-                                  'Erro ao carregar professores',
+                                  'Erro ao carregar estudantes',
                                   style: TextStyle(
                                     fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                     fontSize: 24,
@@ -507,17 +507,17 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                           );
                         }
 
-                        final professors = snapshot.data ?? [];
+                        final students = snapshot.data ?? [];
 
-                        if (professors.isEmpty) {
+                        if (students.isEmpty) {
                           return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.school_outlined, size: 80, color: Colors.grey.shade400),
+                                Icon(Icons.person_outline, size: 80, color: Colors.grey.shade400),
                                 SizedBox(height: 20),
                                 Text(
-                                  'Nenhum professor disponível',
+                                  'Nenhum estudante disponível',
                                   style: TextStyle(
                                     fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                     fontSize: 24,
@@ -540,10 +540,10 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                         }
 
                         return ListView.separated(
-                          itemCount: professors.length,
+                          itemCount: students.length,
                           separatorBuilder: (_, __) => const SizedBox(height: 16),
                           itemBuilder: (context, index) {
-                            final prof = professors[index];
+                            final student = students[index];
                             return FractionallySizedBox(
                               widthFactor: 0.6,
                               alignment: Alignment.centerLeft,
@@ -559,7 +559,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ChatScreen(recipient: prof),
+                                        builder: (context) => ChatScreen(recipient: student),
                                       ),
                                     );
                                   },
@@ -578,7 +578,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                prof.name,
+                                                student.name,
                                                 style: TextStyle(
                                                   fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                                   fontSize: 24,
@@ -587,7 +587,7 @@ class DesktopSelectProfessorScreen extends StatelessWidget {
                                               ),
                                               const SizedBox(height: 8),
                                               Text(
-                                                prof.email,
+                                                student.email,
                                                 style: TextStyle(
                                                   fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                                                   fontSize: 16,

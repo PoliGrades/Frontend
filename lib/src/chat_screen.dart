@@ -2,12 +2,17 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/assignment_overview_screen.dart';
+import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/data/Message.dart';
 import 'package:polieats_frontend/src/data/User.dart';
-import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
+import 'package:polieats_frontend/src/privacy_policy_screen.dart';
+import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 import 'package:polieats_frontend/src/socket_service.dart';
-import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
+import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 import '../main.dart';
 
@@ -83,7 +88,9 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     // Join chat room
-    socketService.emit("joinChat", [widget.recipient.id]);
+    socketService.emit("joinChat", [globals.currentUser.role == UserRole.STUDENT
+        ? widget.recipient.id
+        : globals.currentUser.id]);
   }
 
   void _sendMessage() {
@@ -92,7 +99,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
     // Send message via socket
     socketService.emit("sendMessage", [{
-      'professorID': widget.recipient.id,
+      'professorID': globals.currentUser.role == UserRole.STUDENT
+          ? widget.recipient.id
+          : globals.currentUser.id,
       'message': text,
     }]);
     
@@ -159,36 +168,19 @@ class DesktopChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+    final dividerHeight = size.height - appBarHeight;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: const Color.fromARGB(255, 245, 250, 251),
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset('assets/images/logo.png', width: 40, height: 40),
-            Container(
-              margin: const EdgeInsets.only(left: 20),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(100)),
-                color: Color.fromARGB(255, 45, 176, 194),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white,
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: const CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.transparent,
-                child: Icon(Icons.person, size: 20, color: Colors.white),
-              ),
-            ),
+            UserIconDropdown(radius: 20),
           ],
         ),
       ),
@@ -205,8 +197,10 @@ class DesktopChatScreen extends StatelessWidget {
                     title: const Text('Início'),
                     onTap: () {
                       Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(user: currentUser),
+                        MaterialPageRoute(builder: (context) => 
+                          globals.currentUser.role == UserRole.STUDENT
+                            ? HomeScreen()
+                            : AdminHomeScreen()
                         ),
                         (route) => false,
                       );
@@ -219,19 +213,31 @@ class DesktopChatScreen extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.book),
                     title: const Text('Matérias'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => CourseOverviewScreen()),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
                   ListTile(
                     leading: const Icon(Icons.assignment),
                     title: const Text('Atividades'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
                   ListTile(
                     leading: const Icon(Icons.person),
                     title: const Text('Perfil'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => ProfileScreen()),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
                   ListTile(
@@ -243,7 +249,11 @@ class DesktopChatScreen extends StatelessWidget {
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(6)),
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => SelectProfessorScreen()),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -254,7 +264,7 @@ class DesktopChatScreen extends StatelessWidget {
             child: Center(
               child: Container(
                 width: 1,
-                height: double.infinity,
+                height: dividerHeight > 0 ? dividerHeight : size.height,
                 color: Colors.grey.shade300,
               ),
             ),
@@ -265,137 +275,200 @@ class DesktopChatScreen extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.only(
-                      left: 40, right: 40, top: 10, bottom: 10),
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade300, width: 1),
+                    ),
+                  ),
                   child: Row(
                     children: [
                       IconButton(
                         tooltip: 'Voltar',
                         icon: const Icon(
                           Icons.arrow_back,
-                          size: 32,
+                          size: 28,
                           color: Colors.grey,
                         ),
-                        onPressed: () => Navigator.of(context).maybePop(),
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.account_circle, size: 60, color: Colors.grey),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Prof. ${recipient.name}',
-                        style: GoogleFonts.leagueSpartan(
-                          fontSize: 26,
-                          color: Colors.grey[800],
-                          fontWeight: FontWeight.w600,
+                      const SizedBox(width: 16),
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: const Color.fromARGB(255, 45, 176, 194),
+                        child: Icon(Icons.person, size: 30, color: Colors.white),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              recipient.name,
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            Text(
+                              recipient.email,
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
 
-                Container(height: 1, color: Colors.grey[300]),
-
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: size.width * 0.08,
-                      vertical: 40,
-                    ),
+                    padding: const EdgeInsets.all(32),
                     child: Column(
                       children: [
                         Expanded(
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.grey.shade200),
                             ),
-                            padding: const EdgeInsets.all(32),
-                            child: SingleChildScrollView(
-                              controller: scrollController,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  ...messages.map(
-                                    (message) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 24),
+                            padding: const EdgeInsets.all(24),
+                            child: messages.isEmpty 
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.chat_bubble_outline,
+                                        size: 64,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Nenhuma mensagem ainda',
+                                        style: TextStyle(
+                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Envie uma mensagem para iniciar a conversa',
+                                        style: TextStyle(
+                                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                          fontSize: 16,
+                                          color: Colors.grey.shade400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  controller: scrollController,
+                                  padding: EdgeInsets.zero,
+                                  itemCount: messages.length,
+                                  itemBuilder: (context, index) {
+                                    final message = messages[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 16),
                                       child: Align(
-                                        alignment: message.senderId == 
-                                                currentUser.id
+                                        alignment: message.senderId == globals.currentUser.id
                                             ? Alignment.centerRight
                                             : Alignment.centerLeft,
                                         child: ChatBubble(
                                           text: message.message,
                                           timestamp: message.timestamp,
-                                          isOwn: message.senderId ==
-                                              currentUser.id,
+                                          isOwn: message.senderId == globals.currentUser.id,
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                    );
+                                  },
+                                ),
                           ),
                         ),
-                        const SizedBox(height: 30),
-                        // campo de mensagem
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: messageController,
-                                style: GoogleFonts.leagueSpartan(fontSize: 18),
-                                decoration: InputDecoration(
-                                  hintText: 'Digite sua mensagem...',
-                                  hintStyle: GoogleFonts.leagueSpartan(
-                                    color: Colors.grey[500],
-                                    fontSize: 18,
+                        const SizedBox(height: 24),
+                        // Campo de mensagem
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade300),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: messageController,
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 16,
                                   ),
-                                  filled: true,
-                                  fillColor: Colors.grey[100],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 22,
+                                  decoration: InputDecoration(
+                                    hintText: 'Digite sua mensagem...',
+                                    hintStyle: TextStyle(
+                                      fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                      color: Colors.grey[500],
+                                      fontSize: 16,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 16,
+                                    ),
+                                    border: InputBorder.none,
                                   ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide.none,
-                                  ),
+                                  onSubmitted: (_) => onSendMessage(),
                                 ),
-                                onSubmitted: (_) => onSendMessage(),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.send,
-                                size: 34,
-                                color: Color.fromARGB(255, 45, 176, 194),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.send,
+                                    size: 24,
+                                    color: Color.fromARGB(255, 45, 176, 194),
+                                  ),
+                                  onPressed: onSendMessage,
+                                ),
                               ),
-                              onPressed: onSendMessage,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 16),
                         Center(
-                          // politica de privacidade
                           child: RichText(
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text:
-                                      'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
-                                  style: GoogleFonts.leagueSpartan(
-                                    fontSize: 15,
+                                  text: 'Todas as mensagens enviadas são utilizadas de acordo com a nossa ',
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 14,
                                     color: Colors.grey[600],
                                   ),
                                 ),
                                 TextSpan(
                                   text: 'Política de Privacidade.',
-                                  style: GoogleFonts.leagueSpartan(
-                                    fontSize: 15,
+                                  style: TextStyle(
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 14,
                                     color: const Color.fromARGB(255, 45, 176, 194),
                                     decoration: TextDecoration.underline,
                                   ),
@@ -404,8 +477,7 @@ class DesktopChatScreen extends StatelessWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              const PrivacyPolicyScreen(),
+                                          builder: (context) => const PrivacyPolicyScreen(),
                                         ),
                                       );
                                     },
@@ -414,8 +486,6 @@ class DesktopChatScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        
-                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -447,130 +517,306 @@ class MobileChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
-    return SafeArea(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            top: 20,
-            left: 8,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: Icon(
-                    Icons.arrow_back,
-                    size: 28,
-                    color: Colors.grey[800],
-                  ),
-                  tooltip: 'Voltar',
-                  onPressed: () => Navigator.of(context).maybePop(),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: 20,
+              left: 8,
+              right: 8,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.account_circle, size: 50, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  'Prof. Calvetti',
-                  style: GoogleFonts.leagueSpartan(
-                    height: 1,
-                    fontSize: 20,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Container(height: 1, color: Colors.grey[300]),
-          ),
-          SizedBox(
-            width: size.width,
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(
-                top: 90,
-                start: 16,
-                end: 16,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final message = messages[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Align(
-                            alignment: message.senderId == globals.currentUser.id
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: ChatBubble(
-                              text: message.message,
-                              timestamp: message.timestamp,
-                              isOwn: message.senderId == globals.currentUser.id,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InputWithTile(
-                          title: '',
-                          hintText: 'Digite sua mensagem...',
-                          onChanged: (value) {},
-                          bottomMargin: 4,
-                          controller: messageController,
-                          suffixIcon: IconButton(
-                            tooltip: 'Enviar',
-                            icon: const Icon(
-                              Icons.send,
-                              size: 24,
-                              color: Color.fromARGB(255, 45, 176, 194),
-                            ),
-                            onPressed: onSendMessage,
-                          ),
-                          onSubmitted: (_) => onSendMessage(),
-                        ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        size: 28,
+                        color: Colors.grey[800],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Center(
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
+                      tooltip: 'Voltar',
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 12),
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundColor: const Color.fromARGB(255, 45, 176, 194),
+                      child: Icon(Icons.person, size: 25, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextSpan(
-                            text:
-                                'Todas as mensagens enviadas são utilizadas de acordo com a nossa política de privacidade.',
-                            style: GoogleFonts.leagueSpartan(
+                          Text(
+                            recipient.name,
+                            style: TextStyle(
+                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          Text(
+                            recipient.email,
+                            style: TextStyle(
+                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
                               fontSize: 12,
                               color: Colors.grey[600],
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chat,
+                      size: 24,
+                      color: const Color.fromARGB(255, 45, 176, 194),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 100,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  16,
+                  16,
+                  MediaQuery.of(context).viewInsets.bottom + 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: messages.isEmpty 
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(32),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.chat_bubble_outline,
+                                      size: 48,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Nenhuma mensagem ainda',
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Envie uma mensagem para iniciar',
+                                      style: TextStyle(
+                                        fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                        fontSize: 14,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: scrollController,
+                              padding: const EdgeInsets.all(16),
+                              itemCount: messages.length,
+                              itemBuilder: (context, index) {
+                                final message = messages[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: Align(
+                                    alignment: message.senderId == globals.currentUser.id
+                                        ? Alignment.centerRight
+                                        : Alignment.centerLeft,
+                                    child: ChatBubble(
+                                      text: message.message,
+                                      timestamp: message.timestamp,
+                                      isOwn: message.senderId == globals.currentUser.id,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: messageController,
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                fontSize: 16,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Digite sua mensagem...',
+                                hintStyle: TextStyle(
+                                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                  color: Colors.grey[500],
+                                  fontSize: 16,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              onSubmitted: (_) => onSendMessage(),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: IconButton(
+                              tooltip: 'Enviar',
+                              icon: const Icon(
+                                Icons.send,
+                                size: 20,
+                                color: Color.fromARGB(255, 45, 176, 194),
+                              ),
+                              onPressed: onSendMessage,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Todas as mensagens são utilizadas de acordo com a nossa ',
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'política de privacidade.',
+                              style: TextStyle(
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                fontSize: 11,
+                                color: const Color.fromARGB(255, 45, 176, 194),
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const PrivacyPolicyScreen(),
+                                    ),
+                                  );
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        iconSize: 24,
+        selectedItemColor: const Color.fromARGB(255, 45, 176, 194),
+        currentIndex: 4,
+        selectedLabelStyle: TextStyle(
+          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+          fontSize: 12,
+        ),
+        onTap: (value) {
+          switch (value) {
+            case 0:
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => 
+                          globals.currentUser.role == UserRole.STUDENT
+                            ? HomeScreen()
+                            : AdminHomeScreen()),
+                (route) => false,
+              );
+              break;
+            case 1:
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => CourseOverviewScreen()),
+              );
+              break;
+            case 2:
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()),
+              );
+              break;
+            case 3:
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+              break;
+            case 4:
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => SelectProfessorScreen()),
+              );
+              break;
+          }
+        },
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
+          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         ],
       ),
     );

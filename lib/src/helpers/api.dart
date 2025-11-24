@@ -10,6 +10,7 @@ import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/Submissions.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/data/User.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Api {
   final String baseUrl = 'http://localhost:3000';
@@ -703,17 +704,13 @@ class Api {
 
   // File Download Methods
   Future<void> downloadFile(String filename) async {
-    final response = await dio.get(
-      '/files/download/$filename',
-      options: Options(
-        responseType: ResponseType.bytes,
-      )
-    );
+    // Parse filename, it always comes in this format "uploads\\<actual_filename>"
+    print(filename);
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to download file: ${response.statusCode}');
-    }
-    
-    // Handle file download - this would typically save to downloads or open in browser
+    final actualFilename = filename.split('\\').last;
+    print('Downloading file: $actualFilename');
+
+    final Uri url = Uri.parse('$baseUrl/files/download/$actualFilename');
+    await launchUrl(url);
   }
 }

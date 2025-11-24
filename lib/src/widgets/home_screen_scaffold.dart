@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/management_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';
 
 class HomeScreenScaffold extends StatelessWidget {
   const HomeScreenScaffold({super.key, required this.body});
@@ -46,7 +46,7 @@ class HomeScreenScaffold extends StatelessWidget {
             case 4:
               Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (context) => ChatScreen(professorID: 1234,)));
+              ).push(MaterialPageRoute(builder: (context) => SelectProfessorScreen()));
           }
         },
         items: const <BottomNavigationBarItem>[
