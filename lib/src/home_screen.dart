@@ -16,6 +16,7 @@ import 'package:polieats_frontend/src/widgets/components/user_header.dart';
 import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:polieats_frontend/src/notices_overview_screen.dart';
+import 'package:polieats_frontend/src/select_professor_screen.dart';        
 
 import '../main.dart';
 
@@ -1079,7 +1080,7 @@ class DesktopHomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),),
+                              builder: (context) => SelectProfessorScreen(),
                             ),
                           );
                         },
