@@ -31,6 +31,7 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   String selectedCourse = '';
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   final assignmentsController = Assignments();
 
@@ -136,7 +137,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       
       // Show error message to user
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Erro ao carregar dados: $e'),
             backgroundColor: Colors.red,
@@ -173,7 +174,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
     if (title.isEmpty || content.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Por favor, preencha todos os campos'),
             backgroundColor: Colors.red,
@@ -185,7 +186,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
     if (course == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Nenhuma matéria selecionada'),
             backgroundColor: Colors.red,
@@ -209,7 +210,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
       // Show success message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Aviso criado com sucesso!'),
             backgroundColor: Colors.green,
@@ -236,7 +237,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Erro ao criar aviso: $e'),
             backgroundColor: Colors.red,
@@ -289,40 +290,43 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth >= 800) {
-            return AdminDesktopHomeScreen(
-              selectedCourse: selectedCourse,
-              assignments: assignments,
-              notices: notices,
-              course: course,
-              isLoading: isLoading,
-              hasNoCourses: hasNoCourses,
-              onCourseChanged: onCourseChanged,
-              onReloadData: _loadInitialData,
-              onCreateNotice: _createNotice,
-              noticeTitleController: _noticeTitleController,
-              noticeContentController: _noticeContentController,
-            );
-          } else {
-            return AdminMobileHomeScreen(
-              selectedCourse: selectedCourse,
-              assignments: assignments,
-              notices: notices,
-              course: course,
-              isLoading: isLoading,
-              hasNoCourses: hasNoCourses,
-              onCourseChanged: onCourseChanged,
-              onReloadData: _loadInitialData,
-              onCreateNotice: _createNotice,
-              noticeTitleController: _noticeTitleController,
-              noticeContentController: _noticeContentController,
-            );
-          }
-        },
+    return ScaffoldMessenger(
+      key: _scaffoldMessengerKey,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth >= 800) {
+              return AdminDesktopHomeScreen(
+                selectedCourse: selectedCourse,
+                assignments: assignments,
+                notices: notices,
+                course: course,
+                isLoading: isLoading,
+                hasNoCourses: hasNoCourses,
+                onCourseChanged: onCourseChanged,
+                onReloadData: _loadInitialData,
+                onCreateNotice: _createNotice,
+                noticeTitleController: _noticeTitleController,
+                noticeContentController: _noticeContentController,
+              );
+            } else {
+              return AdminMobileHomeScreen(
+                selectedCourse: selectedCourse,
+                assignments: assignments,
+                notices: notices,
+                course: course,
+                isLoading: isLoading,
+                hasNoCourses: hasNoCourses,
+                onCourseChanged: onCourseChanged,
+                onReloadData: _loadInitialData,
+                onCreateNotice: _createNotice,
+                noticeTitleController: _noticeTitleController,
+                noticeContentController: _noticeContentController,
+              );
+            }
+          },
+        ),
       ),
     );
   }

@@ -79,8 +79,8 @@ class NoticeCard extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    notice.content.length > 100 
-                      ? '${notice.content.substring(0, 100)}...'
+                    notice.content.length > 60 
+                      ? '${notice.content.substring(0, 60)}...'
                       : notice.content,
                     style: TextStyle(
                       fontFamily: GoogleFonts.leagueSpartan().fontFamily,

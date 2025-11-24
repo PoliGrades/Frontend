@@ -27,6 +27,7 @@ class AssignmentScreen extends StatefulWidget {
 }
 
 class _AssignmentScreenState extends State<AssignmentScreen> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   Assignment? assignment;
   bool isLoading = true;
   String? errorMessage;
@@ -125,7 +126,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
         }
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(
                 '${result.files.length} arquivo(s) anexado(s) com sucesso!',
@@ -137,7 +138,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Erro ao anexar arquivo: $e'),
             backgroundColor: Colors.red,
@@ -167,7 +168,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
       await _loadUserSubmission();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Tarefa enviada com sucesso!'),
             backgroundColor: Colors.green,
@@ -176,7 +177,7 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Erro ao enviar tarefa: $e'),
             backgroundColor: Colors.red,
@@ -207,15 +208,18 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Consider desktop mode for screens wider than 1000px
-        if (constraints.maxWidth > 1000) {
-          return _buildDesktopLayout(context);
-        } else {
-          return _buildMobileLayout(context);
-        }
-      },
+    return ScaffoldMessenger(
+      key: _scaffoldMessengerKey,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Consider desktop mode for screens wider than 1000px
+          if (constraints.maxWidth > 1000) {
+            return _buildDesktopLayout(context);
+          } else {
+            return _buildMobileLayout(context);
+          }
+        },
+      ),
     );
   }
 

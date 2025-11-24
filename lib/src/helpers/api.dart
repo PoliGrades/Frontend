@@ -13,7 +13,7 @@ import 'package:polieats_frontend/src/data/User.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Api {
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl = 'https://api.poligrades.matelz.dev';
   late Dio dio;
   late BrowserHttpClientAdapter httpClientAdapter;
 
@@ -704,10 +704,10 @@ class Api {
 
   // File Download Methods
   Future<void> downloadFile(String filename) async {
-    // Parse filename, it always comes in this format "uploads\\<actual_filename>"
+    // Parse filename, it always comes in this format "uploads\\<actual_filename>" or "uploads/<actual_filename>"
     print(filename);
 
-    final actualFilename = filename.split('\\').last;
+    final actualFilename = filename.split('\\').last.split('/').last;
     print('Downloading file: $actualFilename');
 
     final Uri url = Uri.parse('$baseUrl/files/download/$actualFilename');

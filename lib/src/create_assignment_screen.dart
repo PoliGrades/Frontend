@@ -29,6 +29,7 @@ class CreateAssignmentScreen extends StatefulWidget {
 }
 
 class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   List<CourseClass> availableClasses = [];
   bool isLoadingClasses = true;
   bool isPickingFiles = false;
@@ -69,15 +70,18 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Consider desktop mode for screens wider than 1000px
-        if (constraints.maxWidth > 1000) {
-          return _buildDesktopLayout(context);
-        } else {
-          return _buildMobileLayout(context);
-        }
-      },
+    return ScaffoldMessenger(
+      key: _scaffoldMessengerKey,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Consider desktop mode for screens wider than 1000px
+          if (constraints.maxWidth > 1000) {
+            return _buildDesktopLayout(context);
+          } else {
+            return _buildMobileLayout(context);
+          }
+        },
+      ),
     );
   }
 
@@ -471,7 +475,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                               }
                             }
 
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            _scaffoldMessengerKey.currentState?.showSnackBar(
                               SnackBar(
                                 content: Text(
                                   '${result.files.length} arquivo(s) anexado(s) com sucesso!',
@@ -481,7 +485,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                             );
                           }
                         } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          _scaffoldMessengerKey.currentState?.showSnackBar(
                             SnackBar(
                               content: Text('Erro ao anexar arquivo: $e'),
                               backgroundColor: Colors.red,
@@ -563,7 +567,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                                         setState(() {
                                           CreateAssignmentScreen.attachedFiles!.removeAt(index);
                                         });
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        _scaffoldMessengerKey.currentState?.showSnackBar(
                                           SnackBar(
                                             content: Text('Arquivo removido'),
                                             backgroundColor: Colors.orange,
@@ -640,7 +644,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
 
                     // Validate form before submitting
                     if (CreateAssignmentScreen.titleController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Por favor, insira um título para a atividade'),
                           backgroundColor: Colors.red,
@@ -650,7 +654,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                     }
 
                     if (CreateAssignmentScreen.descriptionController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Por favor, insira uma descrição para a atividade'),
                           backgroundColor: Colors.red,
@@ -660,7 +664,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                     }
 
                     if (CreateAssignmentScreen.classController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Por favor, selecione uma turma'),
                           backgroundColor: Colors.red,
@@ -670,7 +674,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                     }
 
                     if (CreateAssignmentScreen.dueDate == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Por favor, selecione uma data de entrega'),
                           backgroundColor: Colors.red,
@@ -683,7 +687,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                     final selectedClassId = int.tryParse(CreateAssignmentScreen.classController.text);
                     print(selectedClassId);
                     if (selectedClassId == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Erro: ID da turma inválido'),
                           backgroundColor: Colors.red,
@@ -703,7 +707,7 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                       );
                       
                       // Show success message
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Atividade criada com sucesso!'),
                           backgroundColor: Colors.green,
@@ -718,9 +722,13 @@ class _CreateAssignmentScreenState extends State<CreateAssignmentScreen> {
                       CreateAssignmentScreen.attachedFiles?.clear();
                       
                       // Navigate back
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => AdminHomeScreen(),
+                        ),
+                      );
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      _scaffoldMessengerKey.currentState?.showSnackBar(
                         SnackBar(
                           content: Text('Erro ao criar atividade: $e'),
                           backgroundColor: Colors.red,
