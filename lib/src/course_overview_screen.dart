@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:polieats_frontend/src/assignment_overview_screen.dart';
-import 'package:polieats_frontend/src/assignment_screen.dart';
+import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/widgets/course_overview_card.dart';
-import 'package:polieats_frontend/src/profile_screen.dart';
+import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 
 class CourseOverviewScreen extends StatefulWidget{
@@ -15,7 +17,6 @@ class CourseOverviewScreen extends StatefulWidget{
 }
 
 class _CourseOverviewScreen extends State<CourseOverviewScreen> {
-  final coursesController = Courses();
   late final List<Course> courses;
   final colorScheme = ColorScheme.fromSeed(
     seedColor: Color.fromARGB(255, 45, 176, 194),
@@ -26,7 +27,7 @@ class _CourseOverviewScreen extends State<CourseOverviewScreen> {
   @override
   void initState() {
     super.initState();
-    courses = coursesController.allCourses;
+    courses = globals.courseController.allSubjects;
   }
 
   void _onItemTapped(int index) {
@@ -161,32 +162,15 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
     final size = MediaQuery.of(context).size;
         
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset('assets/images/logo.png', width: 40, height: 40),
-            Container(
-              margin: EdgeInsets.only(left: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(100)),
-                color: colorScheme.primary,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white,
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.transparent,
-                child: Icon(Icons.person, size: 20, color: Colors.white),
-              ),
-            ),
+            UserIconDropdown(radius: 20),
           ],
         ),
       ),
@@ -198,116 +182,78 @@ class DesktopCourseOverviewScreen extends StatelessWidget {
                 width: size.width * 0.20,
                 child: Container(
                   padding: EdgeInsets.all(20),
-                  child: SingleChildScrollView(
                   child: Column(
                     spacing: 20,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListTile(
-                        leading: Icon(
-                          Icons.home,
-                          color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
-                        ),
-                        title: Text(
-                          'Início', 
-                          style: TextStyle(
-                            color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
-                          )
-                        ),
-                        selected: selectedIndex == 0,
+                        leading: Icon(Icons.home),
+                        title: Text('Início'),
+                        // Make it rounded
+                        selected: false,
                         selectedTileColor: Color.fromARGB(255, 45, 176, 194),
                         selectedColor: Colors.white,
-                        // Make it rounded
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(6)),
                         ),
-                        onTap: () => onItemTapped(0),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => globals.currentUser.role == UserRole.STUDENT ? HomeScreen() : AdminHomeScreen()),
+                          );
+                        },
                       ),
                       ListTile(
-                        leading: Icon(
-                          Icons.book,
-                          color: selectedIndex == 1 ? Colors.white : defaultInactiveColor,
-                        ),
-                        title: Text(
-                          'Matérias', 
-                          style: TextStyle(
-                            color: selectedIndex == 1 ? Colors.white : defaultInactiveColor,
-                          )
-                        ),
-                        selected: selectedIndex == 1,
-                        selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        leading: Icon(Icons.book),
+                        title: Text('Matérias'),
+                        selected: true,
+                        selectedTileColor: Color.fromARGB(255, 45, 176, 194),
                         selectedColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                        onTap: () => onItemTapped(1),
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        onTap: () {
+                        },
                       ),
                       ListTile(
-                      leading: Icon(
-                        Icons.assignment,
-                        color: selectedIndex == 2 ? Colors.white : defaultInactiveColor,
-                        ),
-                      title: Text(
-                        'Atividades',
-                        style: TextStyle(
-                          color: selectedIndex == 2 ? Colors.white : defaultInactiveColor,
-                        )
+                        leading: Icon(Icons.assignment),
+                        title: Text('Atividades'),
+                        onTap: () {
+                        },
                       ),
-                      selected: selectedIndex == 2,
-                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
-                        selectedColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                      onTap: () {
-                          Navigator.push(         
-                            context, 
+                      ListTile(
+                        leading: Icon(Icons.person),
+                        title: Text('Perfil'),
+                        onTap: () {
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.chat),
+                        title: Text('Chat'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
                             MaterialPageRoute(
-                              builder: (context) => AssignmentOverviewScreen(),
+                              builder: (context) => ChatScreen(professorID: 1234),
                             ),
                           );
                         },
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.person,
-                        color: selectedIndex == 3 ? Colors.white : defaultInactiveColor,
-                        ),
-                      title: Text(
-                        'Perfil',
-                        style: TextStyle(
-                          color: selectedIndex == 3 ? Colors.white : defaultInactiveColor,
-                        )
                       ),
-                      selected: selectedIndex == 3,
-                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
-                        selectedColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                      onTap: () {
-                        Navigator.push(         
-                          context, 
-                          MaterialPageRoute(
-                            builder: (context) => ProfileScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
-         // Vertical divider that accounts for the AppBar height
-          SizedBox(
-            width: 20,
-            child: Center(
-              child: Container(
-                width: 1,
-                height: double.infinity,
-                color: Colors.grey.shade300,
+              // Vertical divider that accounts for the AppBar height
+              SizedBox(
+                width: 20,
+                child: Center(
+                  child: Container(
+                    width: 1,
+                    height: double.infinity,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
+            Expanded(
             child: Center(
               child: SizedBox(
                 width: 800, 

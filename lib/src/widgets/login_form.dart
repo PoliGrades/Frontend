@@ -114,10 +114,10 @@ class LembrarMe extends StatelessWidget {
   final ValueChanged<bool?> onChanged;
 
   const LembrarMe({
-    Key? key,
+    super.key,
     required this.lembrar,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +132,9 @@ class LembrarMe extends StatelessWidget {
           ),
           fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const Color(0xFFF1EB4C3); //checkbox selecionado
+            return const Color(0xfff1eb4c3); //checkbox selecionado
           }
-          return const Color(0xFFFD9D9D9); //checkbox não selecionado
+          return const Color(0xfffd9d9d9); //checkbox não selecionado
         }),
         overlayColor: WidgetStateProperty.all(Colors.transparent), //remove focus effect
         ),
@@ -143,7 +143,7 @@ class LembrarMe extends StatelessWidget {
         Text('Lembre-se de mim',
           style: GoogleFonts.leagueSpartan(
             fontSize: 14,
-            color: const Color(0xFFF676161),
+            color: const Color(0xfff676161),
           ),
         ),
       ],
@@ -155,7 +155,7 @@ class LembrarMe extends StatelessWidget {
 class EsqueceuSenha extends StatelessWidget {
   final String url; 
 
-  EsqueceuSenha({
+  const EsqueceuSenha({
     super.key,
     required this.url,
   });
@@ -176,7 +176,7 @@ class EsqueceuSenha extends StatelessWidget {
         text: 'Esqueceu a senha?', 
         style: GoogleFonts.leagueSpartan(
           fontSize: 14, 
-          color: const Color(0xFFFF1EB4C3),
+          color: const Color(0xffff1eb4c3),
           decoration: TextDecoration.underline,
         ),
         recognizer: 

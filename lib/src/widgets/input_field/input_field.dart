@@ -50,22 +50,22 @@ class _InputFieldState extends State<InputField> {  //parte mutável
               widget.topLabel!,
               style: GoogleFonts.leagueSpartan(
                 fontSize: 16,
-                color: Color(0xFFF676161),
+                color: Color(0xfff676161),
               ),
             ),
             const SizedBox(height: 5),
           ],
           TextFormField(
             controller: _controller,
-            cursorColor: Color(0xFFF1EB4C3),
+            cursorColor: Color(0xfff1eb4c3),
             decoration: InputDecoration(
               hintText: widget.hint,
               hintStyle: GoogleFonts.leagueSpartan(
                 fontSize: 14,
-                color: Color(0xFFF676161),
+                color: Color(0xfff676161),
               ),
               filled: true,
-              fillColor: const Color(0xFFFD9D9D9),
+              fillColor: const Color(0xfffd9d9d9),
               enabledBorder: OutlineInputBorder( //borda padrao
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: Colors.transparent),
@@ -73,7 +73,7 @@ class _InputFieldState extends State<InputField> {  //parte mutável
               focusedBorder: OutlineInputBorder( //borda campo selecionado
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(
-                  color: Color(0xFFF1EB4C3),
+                  color: Color(0xfff1eb4c3),
                   width: 1.5,
                 ),
               ),
