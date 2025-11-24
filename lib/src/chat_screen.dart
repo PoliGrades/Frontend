@@ -501,13 +501,13 @@ class MobileChatScreen extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Align(
-                            alignment: message.senderId == currentUser.id
+                            alignment: message.senderId == globals.currentUser.id
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
                             child: ChatBubble(
                               text: message.message,
                               timestamp: message.timestamp,
-                              isOwn: message.senderId == currentUser.id,
+                              isOwn: message.senderId == globals.currentUser.id,
                             ),
                           ),
                         );
