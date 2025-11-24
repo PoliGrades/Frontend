@@ -939,7 +939,7 @@ class MobileHomeScreen extends StatelessWidget {
             case 4:
               Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (context) => ChatScreen(professorID: 1234,)));
+              ).push(MaterialPageRoute(builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),)));
           }
         },
         items: const <BottomNavigationBarItem>[
@@ -998,6 +998,9 @@ class DesktopHomeScreen extends StatelessWidget {
         ),
       );
     }
+
+    final noticesController = Notices();
+    final notices = noticesController.notices;
 
     final appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
     final dividerHeight = size.height - appBarHeight;
@@ -1076,7 +1079,7 @@ class DesktopHomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(professorID: 1234),
+                              builder: (context) => ChatScreen(recipient: User(email: 'professor.exemplo@escola.com', name: 'Professor Exemplo', id: 1234, role: 'PROFESSOR'),),
                             ),
                           );
                         },
@@ -1121,12 +1124,12 @@ class DesktopHomeScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 40),
-                      // Create two columns, one that takes most of the space and the other that takes around 20/15%
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 30,
                         children: [
                           Expanded(
-                            flex: 4,
+                            flex: 5,
                             child: Column(
                               spacing: 20,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1254,15 +1257,15 @@ class DesktopHomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          SizedBox(width: 16),
+                          // SizedBox(width: 16),
                           Expanded(
-                            flex: 3,
+                            flex: 5,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // List of activities
                                 SizedBox(
-                                  height: 600,
+                                  height: 500,
                                   child: SfCalendar(
                                     dataSource: AssignmentDataSource(
                                       assignments,
@@ -1301,6 +1304,450 @@ class DesktopHomeScreen extends StatelessWidget {
                             ),
                           ),
                         ],
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        color: Colors.white12,
+                        width: double.infinity,
+                        height: 250,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          spacing: 15,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Últimas atividades",
+                                  style: TextStyle(
+                                    fontFamily:
+                                        GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue.shade100,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Ver todas",
+                                    style: TextStyle(
+                                      fontFamily: GoogleFonts.leagueSpartan()
+                                          .fontFamily,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: assignments.length,
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(width: 10);
+                                },
+                                itemBuilder: (context, index) {
+                                  final assignment = assignments[index];
+                                  final course = coursesController
+                                      .getCourseByName(assignment.course);
+
+                                  return Material(
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AssignmentScreen(
+                                                  assignment: assignment,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: size.width * 0.2,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                          color: Colors.grey.shade50,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              height: 100,
+                                              decoration: BoxDecoration(
+                                                color: course!.color,
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight: Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Stack(
+                                                children: [
+                                                  Positioned(
+                                                    top: 8,
+                                                    left: 8,
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                            vertical: 4,
+                                                            horizontal: 8,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white70,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                              Radius.circular(
+                                                                20,
+                                                              ),
+                                                            ),
+                                                      ),
+                                                      child: Text(
+                                                        f.format(
+                                                          assignment.dueDate,
+                                                        ),
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              GoogleFonts.leagueSpartan()
+                                                                  .fontFamily,
+                                                          fontSize: 12,
+                                                          color: course.color,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Positioned(
+                                                    bottom: -12,
+                                                    right: 8,
+                                                    child: Icon(
+                                                      course.icon,
+                                                      size: 64,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                left: 10,
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    assignment.title,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          GoogleFonts.leagueSpartan()
+                                                              .fontFamily,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    assignment.course,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          GoogleFonts.leagueSpartan()
+                                                              .fontFamily,
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Quadro de avisos
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 5,
+                        ),
+                        color: Colors.white12,
+                        width: size.width,
+                        height: 250,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          spacing: 15,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Quadro de avisos",
+                                  style: TextStyle(
+                                    fontFamily:
+                                        GoogleFonts.leagueSpartan().fontFamily,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue.shade100,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Ver todos",
+                                    style: TextStyle(
+                                      fontFamily: GoogleFonts.leagueSpartan()
+                                          .fontFamily,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: notices.length,
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(width: 10);
+                                },
+                                itemBuilder: (context, index) {
+                                  final notice = notices[index];
+                                  final course = coursesController
+                                      .getCourseByName(notice.course);
+                                  return GestureDetector(
+                                    child: Container(
+                                      width: size.width * 0.2,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        color: Colors.grey.shade50,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                              Radius.circular(
+                                                                1000,
+                                                              ),
+                                                            ),
+                                                        color:
+                                                            course!.accentColor,
+                                                      ),
+                                                      child: Icon(
+                                                        course.icon,
+                                                        size: 20,
+                                                        color: course.color,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      f.format(notice.date),
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            GoogleFonts.leagueSpartan()
+                                                                .fontFamily,
+                                                        fontSize: 12,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade700,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 12),
+                                                Text(
+                                                  notice.title,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 4),
+                                                Text(
+                                                  notice.content,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                    top: Radius.circular(16),
+                                                  ),
+                                            ),
+                                            height:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.height *
+                                                0.95,
+                                            padding: EdgeInsets.all(16),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          width: 40,
+                                                          height: 40,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                  Radius.circular(
+                                                                    1000,
+                                                                  ),
+                                                                ),
+                                                            color: course
+                                                                .accentColor,
+                                                          ),
+                                                          child: Icon(
+                                                            course.icon,
+                                                            size: 30,
+                                                            color: course.color,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 16),
+                                                        Text(
+                                                          course.name,
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                GoogleFonts.leagueSpartan()
+                                                                    .fontFamily,
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    IconButton(
+                                                      icon: Icon(Icons.close),
+                                                      onPressed: () {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 20),
+                                                Text(
+                                                  notice.title,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  'Publicado em: ${f.format(notice.date)},\npor ${notice.owner}',
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 14,
+                                                    color: Colors.grey.shade700,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 20),
+                                                Text(
+                                                  notice.content,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        GoogleFonts.leagueSpartan()
+                                                            .fontFamily,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

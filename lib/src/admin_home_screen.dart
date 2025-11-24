@@ -3,11 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/assignment_screen.dart';
+import 'package:polieats_frontend/src/chat_screen.dart';
+import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/admin_assignment_screen.dart';
 import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/create_assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
 import 'package:polieats_frontend/src/helpers/icon_map.dart';
 import 'package:polieats_frontend/src/management_screen.dart';
@@ -23,7 +27,6 @@ import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
-
   @override
   State<AdminHomeScreen> createState() => _AdminHomeScreenState();
 }
@@ -261,6 +264,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('pt_BR', null);
+    final f = DateFormat('dd/MM/yyyy');
+    String selectedCourse = 'Matemática';
 
     // Show loading screen while fetching initial data
     if (isDataLoading) {
@@ -381,6 +386,21 @@ class AdminMobileHomeScreen extends StatelessWidget {
       );
     }
 
+    final appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+    final dividerHeight = size.height - appBarHeight;
+
+    // return Scaffold(
+    //   backgroundColor: Colors.white,
+    //   body: LayoutBuilder(
+    //     builder: (context, constraints) {
+    //       if (constraints.maxWidth >= 800) {
+    //         return DesktopAdminScreen();
+    //       } else {
+    //         // return MobileAdminScreen();
+    //       }
+    //     },
+    //   ),
+    // );
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -1170,7 +1190,7 @@ class AdminDesktopHomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
