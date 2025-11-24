@@ -46,16 +46,11 @@ class Notices {
     // ),
   ];
   
-  Notices();
-  
   List<Notice> get allNotices => notices;
 
   Notices() {
     fetchAllNotices();
   }
-
-  // Get notices
-  List<Notice> get allNotices => notices;
 
   void fetchAllNotices() async {
     try {

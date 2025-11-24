@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:polieats_frontend/src/data/Notices.dart';
+import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
+import 'package:polieats_frontend/src/data/Notices.dart';
 
 class NoticesOverviewScreen extends StatefulWidget {
   const NoticesOverviewScreen({super.key});
@@ -11,14 +12,12 @@ class NoticesOverviewScreen extends StatefulWidget {
 }
 
 class _NoticesOverviewScreen extends State<NoticesOverviewScreen> {
-  final noticesController = Notices();
-  final coursesController = Courses();
   late final List<Notice> notices;
 
   @override
   void initState() {
     super.initState();
-    notices = noticesController.allNotices; 
+    notices = globals.noticesController.allNotices; 
   }
 
   @override
@@ -53,9 +52,8 @@ class _NoticesOverviewScreen extends State<NoticesOverviewScreen> {
 
 class MobileNoticesOverview extends StatelessWidget { 
   final List<Notice> notices;
-  final coursesController = Courses();
 
-  MobileNoticesOverview({super.key, required this.notices});
+  const MobileNoticesOverview({super.key, required this.notices});
 
   @override
   Widget build(BuildContext context) {
@@ -65,18 +63,18 @@ class MobileNoticesOverview extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final notice = notices[index];
-        final course = coursesController.getCourseByName(notice.course);
+        final course = globals.courseController.getSubjectByName(notice.course);
 
         return GestureDetector(
-          onTap: () => _openNoticeModal(context, notice, course!),
+          onTap: () => _openNoticeModal(context, notice, course),
           child: Container(
             decoration: BoxDecoration(
-              color: course!.accentColor,
+              color: course!.accentColorAsFlutterColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: course.color, width: 2),
+              border: Border.all(color: course.colorAsFlutterColor, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: course.color.withOpacity(0.25),
+                  color: course.colorAsFlutterColor.withOpacity(0.25),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
@@ -90,10 +88,10 @@ class MobileNoticesOverview extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: course.color,
+                    color: course.colorAsFlutterColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(course.icon, color: Colors.white, size: 26),
+                  child: Icon(Icons.book, color: Colors.white, size: 26),
                 ),
                 const SizedBox(width: 14),
 
@@ -168,10 +166,10 @@ class MobileNoticesOverview extends StatelessWidget {
                     width: 45,
                     height: 45,
                     decoration: BoxDecoration(
-                      color: course.color,
+                      color: course.colorAsFlutterColor,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(course.icon, size: 24, color: Colors.white),
+                    child: Icon(Icons.book, size: 24, color: Colors.white),
                   ),
                   const SizedBox(width: 14),
                   Text(

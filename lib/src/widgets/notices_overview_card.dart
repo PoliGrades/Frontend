@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
+import 'package:polieats_frontend/src/data/Notices.dart';
 
 class NoticesOverviewCard extends StatelessWidget {
   final Notice notice;
@@ -13,20 +13,20 @@ class NoticesOverviewCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
-        color: courseData?.accentColor ?? Colors.white,
+        color: courseData?.accentColorAsFlutterColor ?? Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: courseData?.color ?? Colors.grey, width: 2),
+          side: BorderSide(color: courseData?.colorAsFlutterColor ?? Colors.grey, width: 2),
         ),
         child: ListTile(
-          leading: Icon(courseData?.icon, color: courseData?.color, size: 32),
+          leading: Icon(Icons.book, color: courseData?.colorAsFlutterColor, size: 32),
           title: Text(
             notice.title,
             style: TextStyle(
               fontFamily: GoogleFonts.leagueSpartan().fontFamily,
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: courseData?.color,
+              color: courseData?.colorAsFlutterColor,
             ),
           ),
           subtitle: Text(
