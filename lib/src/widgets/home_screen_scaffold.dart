@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/src/chat_screen.dart';
+import 'package:polieats_frontend/src/management_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
 
 class HomeScreenScaffold extends StatelessWidget {
@@ -31,6 +32,9 @@ class HomeScreenScaffold extends StatelessWidget {
             case 0:
               break;
             case 1:
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => ManagementScreen()));
               break;
             case 2:
               break;
@@ -47,7 +51,7 @@ class HomeScreenScaffold extends StatelessWidget {
         },
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Matérias'),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Gerenciar'),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: 'Atividades',

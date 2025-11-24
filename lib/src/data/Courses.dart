@@ -1,121 +1,101 @@
 import 'package:flutter/material.dart';
 
-class Course {
+class Subject {
   final int id;
   final String name;
   final String description;
-  final Color color;
-  final Color accentColor;
+  final String color;
+  final String accentColor;
 
-  Course({
+  Subject({
     required this.id,
     required this.name,
     required this.description,
     required this.color,
     required this.accentColor,
   });
+
+  // Helper method to get Flutter Color from hex string
+  Color get colorAsFlutterColor {
+    String rawColor = color.replaceFirst('#', '');
+    if (rawColor.length == 6) {
+      rawColor = 'FF$rawColor';
+    }
+    return Color(int.parse(rawColor, radix: 16));
+  }
+
+  // Helper method to get Flutter Color from accent hex string
+  Color get accentColorAsFlutterColor {
+    String rawAccent = accentColor.replaceFirst('#', '');
+    if (rawAccent.length == 6) {
+      rawAccent = 'FF$rawAccent';
+    }
+    return Color(int.parse(rawAccent, radix: 16));
+  }
+
+  // Factory constructor for API responses
+  factory Subject.fromJson(Map<String, dynamic> json) {
+    return Subject(
+      id: json['id'],
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      color: json['color'] ?? '#FF000000',
+      accentColor: json['accentColor'] ?? json['color'] ?? '#FF000000',
+    );
+  }
+
+  // Method to convert to JSON for API requests
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'color': color,
+      'accentColor': accentColor,
+    };
+  }
 }
 
-class CourseController {
-  List<Course> courses = [
-    Course(
-      id: 1,
-      name: 'Matemática',
-      description: 'Aprenda os fundamentos da matemática.',
-      color: const Color(0xFF2196F3),
-      accentColor: const Color(0xFFE3F2FD),
-    ),
-    Course(
-      id: 2,
-      name: 'Física',
-      description: 'Explore os conceitos básicos da física.',
-      color: Colors.red,
-      accentColor: Colors.red.shade50,
-    ),
-    Course(
-      id: 3,
-      name: 'Química',
-      description: 'Descubra os segredos da química.',
-      color: Colors.green,
-      accentColor: Colors.green.shade50,
-    ),
-    Course(
-      id: 4,
-      name: 'Biologia',
-      description: 'Entenda os processos da vida.',
-      color: Colors.orange,
-      accentColor: Colors.orange.shade50,
-    ),
-    Course(
-      id: 5,
-      name: 'História',
-      description: 'Reviva os eventos históricos mais importantes.',
-      color: Colors.purple,
-      accentColor: Colors.purple.shade50,
-    ),
-    Course(
-      id: 6,
-      name: 'Geografia',
-      description: 'Explore o mundo ao seu redor.',
-      color: Colors.teal,
-      accentColor: Colors.teal.shade50,
-    ),
-  ];
+// Backwards compatibility - Course is now an alias for Subject
+typedef Course = Subject;
 
-  CourseController();
+class SubjectController {
+  List<Subject> subjects = [];
 
-  List<Course> get allCourses => courses;
+  List<Subject> get allSubjects => subjects;
 
-  Course? getCourseById(int id) {
-    return courses.firstWhere((course) => course.id == id);
+  Subject? getSubjectById(int id) {
+    try {
+      return subjects.firstWhere((subject) => subject.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
-  Course? getCourseByName(String name) {
-    return courses.firstWhere((course) => course.name == name);
+  Subject? getSubjectByName(String name) {
+    try {
+      return subjects.firstWhere((subject) => subject.name == name);
+    } catch (e) {
+      return null;
+    }
   }
 
-  void addCourse(Course course) {
-    courses.add(course);
+  void addSubject(Subject subject) {
+    subjects.add(subject);
   }
 
-  void removeCourse(String name) {
-    courses.removeWhere((course) => course.name == name);
+  void removeSubject(String name) {
+    subjects.removeWhere((subject) => subject.name == name);
   }
 
-  // List<Course> getCoursesByInstructor(String instructor) {
-  //   return courses.where((course) => course.instructor == instructor).toList();
-  // }
-
-  void setCourses(List<Course> newCourses) {
-    courses = newCourses;
+  void setSubjects(List<Subject> newSubjects) {
+    subjects = newSubjects;
   }
 
   void fromJson(List<dynamic> jsonData) {
-    courses = jsonData.map((course) {
-      final name = course['name']?.toString() ?? '';
-      final description = course['description']?.toString() ?? '';
-
-      // parse color hex string (accepts "#RRGGBB", "RRGGBB", "AARRGGBB", etc.)
-      String rawColor = course['color']?.toString() ?? '#FF000000';
-      rawColor = rawColor.replaceFirst('#', '');
-      if (rawColor.length == 6) {
-        rawColor = 'FF$rawColor'; // add opaque alpha if missing
-      }
-      final color = Color(int.parse(rawColor, radix: 16));
-
-      // accentColor falls back to the same color if not provided
-      String rawAccent = course['accentColor']?.toString() ?? course['color']?.toString() ?? '#FF000000';
-      rawAccent = rawAccent.replaceFirst('#', '');
-      if (rawAccent.length == 6) rawAccent = 'FF$rawAccent';
-      final accentColor = Color(int.parse(rawAccent, radix: 16));
-
-      return Course(
-        id: int.parse(course['id']?.toString() ?? '0'),
-        name: name,
-        description: description,
-        color: color,
-        accentColor: accentColor,
-      );
-    }).toList();
+    subjects = jsonData.map((subject) => Subject.fromJson(subject)).toList();
   }
 }
+
+// Backwards compatibility
+typedef CourseController = SubjectController;

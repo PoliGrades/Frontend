@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:polieats_frontend/main.dart';
 import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
@@ -160,7 +161,7 @@ class DesktopLoginScreen extends StatelessWidget {
                                 passwordController.text,
                               )
                               .then((user) {
-                                if (user.role == 'PROFESSOR') {
+                                if (user.role == UserRole.PROFESSOR) {
                                   // Navigate to professor home screen
                                   Navigator.push(
                                     context,
@@ -371,7 +372,7 @@ class MobileLoginScreen extends StatelessWidget {
                                 passwordController.text,
                               )
                               .then((user) {
-                                if (user.role == 'PROFESSOR') {
+                                if (user.role == UserRole.PROFESSOR) {
                                   // Navigate to professor home screen
                                   Navigator.push(
                                     context,
