@@ -12,7 +12,7 @@ class CourseOverviewCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
-        color: course.accentColor,
+        color: course.accentColorAsFlutterColor,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: InkWell(
@@ -33,12 +33,12 @@ class CourseOverviewCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: course.color,
+                          color: course.colorAsFlutterColor,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        course.instructor,
+                        course.name,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade700,
@@ -47,7 +47,7 @@ class CourseOverviewCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(course.icon, size: 30, color: course.color),
+                Icon(Icons.book, size: 30, color: course.colorAsFlutterColor),
                 const SizedBox(width: 15),
                 const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],

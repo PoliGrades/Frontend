@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:polieats_frontend/src/assignment_screen.dart';
-import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/chat_screen.dart';
+import 'package:polieats_frontend/src/course_overview_screen.dart';
 import 'package:polieats_frontend/src/course_screen.dart';
 import 'package:polieats_frontend/src/data/Notices.dart';
 import 'package:polieats_frontend/src/data/Tasks.dart';
@@ -209,6 +209,7 @@ class MobileHomeScreen extends StatelessWidget {
               case 0:
                 break;
               case 1:
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => CourseOverviewScreen()));
                 break;
               case 2:
                 break;
@@ -1029,6 +1030,10 @@ class DesktopHomeScreen extends StatelessWidget {
                         leading: Icon(Icons.book),
                         title: Text('Matérias'),
                         onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => CourseOverviewScreen()),
+                          );
                         },
                       ),
                       ListTile(
