@@ -1,6 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
+import 'package:polieats_frontend/src/privacy_policy_screen.dart';
 import 'package:polieats_frontend/src/widgets/button.dart';
 import 'package:polieats_frontend/src/widgets/input_with_title/InputWithTitle.dart';
 
@@ -14,6 +19,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -21,9 +29,15 @@ class _LoginScreenState extends State<LoginScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 800) {
-            return const DesktopLoginScreen();
+            return DesktopLoginScreen(
+              emailController: emailController,
+              passwordController: passwordController,
+            );
           } else {
-            return const MobileLoginScreen();
+            return MobileLoginScreen(
+              emailController: emailController,
+              passwordController: passwordController,
+            );
           }
         },
       ),
@@ -32,7 +46,14 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class DesktopLoginScreen extends StatelessWidget {
-  const DesktopLoginScreen({super.key});
+  const DesktopLoginScreen({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+  });
+
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   @override
   Widget build(BuildContext context) {
@@ -101,53 +122,142 @@ class DesktopLoginScreen extends StatelessWidget {
                     // Bottom section: button and warning text
                     SizedBox(
                       width: 450,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            spacing: 20,
-                            children: [
-                              InputWithTile(
-                                title: 'Email',
-                                hintText: 'nome@p4ed.com.br',
-                                onChanged: (value) {
-                                  // Handle email change
-                                },
-                              ),
-                              InputWithTile(
-                                title: 'Senha',
-                                hintText: 'Digite sua senha',
-                                onChanged: (value) {
-                                  // Handle password change
-                                },
-                                isPassword: true,
-                                ),
-                              Button(
-                                text: 'Entrar',
-                                onPressed: () {
-                                  // Handle login button press
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 20,
+                        children: [
+                          InputWithTile(
+                            title: 'Email',
+                            hintText: 'nome@p4ed.com.br',
+                            onChanged: (value) {
+                              // Handle email change
+                              emailController.text = value;
+                            },
+                          ),
+                          InputWithTile(
+                            title: 'Senha',
+                            hintText: 'Digite sua senha',
+                            onChanged: (value) {
+                              // Handle password change
+                              passwordController.text = value;
+                            },
+                            isPassword: true,
+                          ),
+                          Button(
+                            text: 'Entrar',
+                            onPressed: () {
+                              // Handle login button press
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => HomeScreen(),
+                              //   ),
+                              // );
+
+                              api
+                              .loginUser(
+                                emailController.text,
+                                passwordController.text,
+                              )
+                              .then((user) {
+                                if (user.role == UserRole.PROFESSOR) {
+                                  // Navigate to professor home screen
                                   Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AdminHomeScreen(),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         HomeScreen(),
                                   ),
                                 );
-                                },
-                              ),
-                              const SizedBox(height: 20),
-                              Center(
-                                child: Text(
-                                  'Ao entrar, você concorda com nossos\n Termos de Serviço e Política de Privacidade.',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.leagueSpartan(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
+                              })
+                              .catchError((error) {
+                                // Show error message
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Email ou senha inválidos.'),
                                   ),
-                                ),
-                              ),
-                            ],
+                                );
+                              });
+                            },
                           ),
-                        ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text:
+                                        'Ao entrar, você concorda com nossos\n',
+                                    style: GoogleFonts.leagueSpartan(
+                                      fontSize: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'Termos de Serviço',
+                                    style: GoogleFonts.leagueSpartan(
+                                      fontSize: 16,
+                                      color: Color.fromARGB(255, 45, 176, 194),
+                                      decoration: TextDecoration.underline,
+                                    ),
+
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        // Handle Terms of Service tap
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PrivacyPolicyScreen(),
+                                          ),
+                                        );
+                                      },
+                                  ),
+                                  TextSpan(
+                                    text: ' e ',
+                                    style: GoogleFonts.leagueSpartan(
+                                      fontSize: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'Política de Privacidade.',
+                                    style: GoogleFonts.leagueSpartan(
+                                      fontSize: 16,
+                                      color: Color.fromARGB(255, 45, 176, 194),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        // Handle Terms of Service tap
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PrivacyPolicyScreen(),
+                                          ),
+                                        );
+                                      },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -160,7 +270,14 @@ class DesktopLoginScreen extends StatelessWidget {
 }
 
 class MobileLoginScreen extends StatelessWidget {
-  const MobileLoginScreen({super.key});
+  const MobileLoginScreen({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+  });
+
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   @override
   Widget build(BuildContext context) {
@@ -175,16 +292,11 @@ class MobileLoginScreen extends StatelessWidget {
             left: 20,
             child: Image.asset('assets/images/logo.png', width: 70, height: 70),
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Image.asset('assets/images/shape_2.png', scale: 2.2),
-          ),
           SizedBox(
             width: size.width,
             child: Padding(
               padding: EdgeInsetsGeometry.directional(
-                top: 150,
+                top: 120,
                 start: 30,
                 end: 30,
                 bottom: 80,
@@ -221,6 +333,7 @@ class MobileLoginScreen extends StatelessWidget {
                         hintText: 'nome@p4ed.com.br',
                         onChanged: (value) {
                           // Handle email change
+                          emailController.text = value;
                         },
                       ),
                       InputWithTile(
@@ -228,6 +341,7 @@ class MobileLoginScreen extends StatelessWidget {
                         hintText: 'Digite sua senha',
                         onChanged: (value) {
                           // Handle password change
+                          passwordController.text = value;
                         },
                         isPassword: true,
                       ),
@@ -245,23 +359,109 @@ class MobileLoginScreen extends StatelessWidget {
                         text: 'Entrar',
                         onPressed: () {
                           // Handle login button press
-                          Navigator.push(
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => HomeScreen(),
+                          //   ),
+                          // );
+
+                          api
+                              .loginUser(
+                                emailController.text,
+                                passwordController.text,
+                              )
+                              .then((user) {
+                                if (user.role == UserRole.PROFESSOR) {
+                                  // Navigate to professor home screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AdminHomeScreen(),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         HomeScreen(),
                                   ),
                                 );
+                              })
+                              .catchError((error) {
+                                // Show error message
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Email ou senha inválidos.'),
+                                  ),
+                                );
+                              });
                         },
                       ),
                       const SizedBox(height: 20),
                       Center(
-                        child: Text(
-                          'Ao entrar, você concorda com nossos\n Termos de Serviço e Política de Privacidade.',
+                        child: RichText(
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.leagueSpartan(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Ao entrar, você concorda com nossos\n',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Termos de Serviço',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Color.fromARGB(255, 45, 176, 194),
+                                  decoration: TextDecoration.underline,
+                                ),
+
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    // Handle Terms of Service tap
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PrivacyPolicyScreen(),
+                                      ),
+                                    );
+                                  },
+                              ),
+                              TextSpan(
+                                text: ' e ',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Política de Privacidade.',
+                                style: GoogleFonts.leagueSpartan(
+                                  fontSize: 12,
+                                  color: Color.fromARGB(255, 45, 176, 194),
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    // Handle Terms of Service tap
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PrivacyPolicyScreen(),
+                                      ),
+                                    );
+                                  },
+                              ),
+                            ],
                           ),
                         ),
                       ),
