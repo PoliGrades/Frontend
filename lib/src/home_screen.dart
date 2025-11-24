@@ -1046,6 +1046,10 @@ class DesktopHomeScreen extends StatelessWidget {
                         leading: Icon(Icons.assignment),
                         title: Text('Atividades'),
                         onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => AssignmentOverviewScreen()),
+                          );
                         },
                       ),
                       ListTile(

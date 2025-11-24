@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/admin_home_screen.dart';
+import 'package:polieats_frontend/src/chat_screen.dart';
 import 'package:polieats_frontend/src/course_overview_screen.dart';
-import 'package:polieats_frontend/src/data/Assignments.dart';
+import 'package:polieats_frontend/src/data/Tasks.dart';
+import 'package:polieats_frontend/src/data/User.dart';
 import 'package:polieats_frontend/src/home_screen.dart';
 import 'package:polieats_frontend/src/profile_screen.dart';
 import 'package:polieats_frontend/src/widgets/assignment_overview_card.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:polieats_frontend/src/widgets/user_icon_dropdown.dart';
 
 class AssignmentOverviewScreen extends StatefulWidget{
   const AssignmentOverviewScreen({super.key});
@@ -15,7 +20,6 @@ class AssignmentOverviewScreen extends StatefulWidget{
 }
 
 class _AssignmentOverviewScreen extends State<AssignmentOverviewScreen> {
-  final assignmentController = Assignments();
   late final List<Assignment> assigments;
   final colorScheme = ColorScheme.fromSeed(
     seedColor: Color.fromARGB(255, 45, 176, 194),
@@ -26,7 +30,7 @@ class _AssignmentOverviewScreen extends State<AssignmentOverviewScreen> {
   @override
   void initState(){
     super.initState();
-    assigments = assignmentController.assignments;
+    assigments = globals.tasksController.allTasks;
   }
 
   void _onItemTapped(int index){
@@ -104,6 +108,7 @@ class MobileAssignmenteOverviewScreen extends StatelessWidget{
     final futureAssignments = assigments.where((a) => a.dueDate.isAfter(now)).toList();
     final pastAssignments = assigments.where((a) => a.dueDate.isBefore(now)).toList();
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 100,
         title: Text(
@@ -204,32 +209,15 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
     final pastAssignments = assignments.where((a) => a.dueDate.isBefore(now)).toList();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset('assets/images/logo.png', width: 40, height: 40),
-            Container(
-              margin: EdgeInsets.only(left: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(100)),
-                color: colorScheme.primary,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white,
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.transparent,
-                child: Icon(Icons.person, size: 20, color: Colors.white),
-              ),
-            ),
+            UserIconDropdown(radius: 20),
           ],
         ),
       ),
@@ -238,93 +226,77 @@ class DesktopAssignmentOverviewScreen extends StatelessWidget{
           children: <Widget>[
             // Lateral menu
             SizedBox(
-              width: size.width * 0.20,
-              child: Container(
-                padding: EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                child: Column(
-                  spacing: 20,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading: Icon(
-                       Icons.home,
-                       color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
-                      ),
-                      title: Text(
-                        'Início', 
-                        style: TextStyle(
-                          color: selectedIndex == 0 ? Colors.white : defaultInactiveColor,
-                        )
-                      ),
-                      selected: selectedIndex == 0,
-                      selectedTileColor: Color.fromARGB(255, 45, 176, 194),
-                      selectedColor: Colors.white,
-                      // Make it rounded
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(6)),
-                      ),
-                      onTap: () => onItemTapped(0),
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.book,
-                        color: selectedIndex == 1 ? Colors.white : defaultInactiveColor,
-                      ),
-                      title: Text(
-                        'Matérias', 
-                        style: TextStyle(
-                          color: selectedIndex == 1 ? Colors.white : defaultInactiveColor,
-                        )
-                      ),
-                      selected: selectedIndex == 1,
-                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
-                      selectedColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6)),
-                      onTap: () => onItemTapped(1),
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.assignment,
-                        color: selectedIndex == 2 ? Colors.white : defaultInactiveColor,
-                        ),
-                      title: Text(
-                        'Atividades',
-                        style: TextStyle(
-                          color: selectedIndex == 2 ? Colors.white : defaultInactiveColor,
-                        )
-                      ),
-                      selected: selectedIndex == 2,
-                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                width: size.width * 0.20,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    spacing: 20,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.home),
+                        title: Text('Início'),
+                        selected: false,
+                        selectedTileColor: Color.fromARGB(255, 45, 176, 194),
                         selectedColor: Colors.white,
+                        // Make it rounded
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                      onTap: () => onItemTapped(2),
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.person,
-                        color: selectedIndex == 3 ? Colors.white : defaultInactiveColor,
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
                         ),
-                      title: Text(
-                        'Perfil',
-                        style: TextStyle(
-                          color: selectedIndex == 3 ? Colors.white : defaultInactiveColor,
-                        )
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => globals.currentUser.role == UserRole.STUDENT ? HomeScreen() : AdminHomeScreen()),
+                          );
+                        },
                       ),
-                      selected: selectedIndex == 3,
-                      selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                      ListTile(
+                        leading: Icon(Icons.book),
+                        title: Text('Matérias'),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => CourseOverviewScreen()),
+                          );
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.assignment),
+                        title: Text('Atividades'),
+                        selected: true,
+                        selectedTileColor: Color.fromARGB(255, 45, 176, 194),
                         selectedColor: Colors.white,
+                        // Make it rounded
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                      onTap: () => onItemTapped(3),
-                    ),
-                  ],
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        onTap: () {
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.person),
+                        //selected: selectedIndex == 3,
+                        selectedTileColor: const Color.fromARGB(255, 45, 176, 194),
+                        selectedColor: Colors.white,
+                        title: Text('Perfil'),
+                        onTap: () {
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.chat),
+                        title: Text('Chat'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(professorID: 1234),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
           // Vertical divider that accounts for the AppBar height
           SizedBox(
             width: 20,

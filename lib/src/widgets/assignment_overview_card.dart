@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:polieats_frontend/src/assignment_screen.dart';
-import 'package:polieats_frontend/src/data/Assignments.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:polieats_frontend/main.dart';
+import 'package:polieats_frontend/src/assignment_screen.dart';
 import 'package:polieats_frontend/src/data/Courses.dart';
+import 'package:polieats_frontend/src/data/Tasks.dart';
 
 
 class AssignmentOverviewCard extends StatelessWidget{
   final Assignment assignment;
-  AssignmentOverviewCard({super.key, required this.assignment});
-  final Courses courseData = Courses();
+  const AssignmentOverviewCard({super.key, required this.assignment});
 
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('pt_BR', null);
     final f = DateFormat('dd/MM/yyyy', 'pt_BR');
 
-    final Course? course = courseData.getCourseByName(assignment.course); 
-    final IconData icon = course?.icon ?? Icons.help;
-    final Color iconColor = course?.color ?? Colors.black;
-    final Color cardColor = course?.accentColor ?? Colors.white;
+    final classCourse = globals.classController.getClassById(assignment.classId);
+    final Course? course = globals.courseController.getSubjectById(classCourse!.subjectId);
+    final IconData icon = Icons.book;
+    final Color iconColor = course?.colorAsFlutterColor ?? Colors.black;
+    final Color cardColor = course?.accentColorAsFlutterColor ?? Colors.white;
   
 
     return Padding(
@@ -30,7 +31,7 @@ class AssignmentOverviewCard extends StatelessWidget{
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: InkWell(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => AssignmentScreen(assignment: assignment)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AssignmentScreen(assignmentId: assignment.id)));
           },
           borderRadius: BorderRadius.circular(15),
           child: Padding(
